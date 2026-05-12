@@ -1,0 +1,3224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EV Intelligence — 欧洲电动车市场分析平台</title>
+
+  <!-- =============================================================
+    字体 (Google Fonts CDN)
+    · Inter — 主字体 (UI text)
+    · JetBrains Mono — 等宽字体 (数据标注)
+    · Noto Sans SC — 中文字体
+  ============================================================= -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <!-- =============================================================
+    Design System + Component Styles
+  ============================================================= -->
+  <style>
+/* EV Intelligence platform — design system */
+.export-btn {
+  position: absolute;
+  top: 14px; right: 14px;
+  z-index: 25;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(6px);
+  color: var(--ink-2);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all .25s ease;
+  opacity: 0.55;
+}
+.export-btn:hover {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+  opacity: 1;
+}
+.export-btn:disabled { opacity: .4; cursor: wait; }
+.export-btn-data { right: 110px; }
+.card { position: relative; }
+
+:root {
+  --bg: #f7f5f0;
+  --bg-2: #efece5;
+  --bg-3: #ffffff;
+  --ink: #14171c;
+  --ink-2: #2b3038;
+  --ink-3: #5a6271;
+  --ink-4: #9aa2b1;
+  --line: #d9d4c7;
+  --line-2: #e8e3d6;
+  --accent: #1d3a5f;
+  --accent-2: #b8845a;
+  --accent-warm: #c97a4a;
+  --good: #2f7d5b;
+  --bad: #b04a3a;
+  --ff-disp: "Söhne", "Helvetica Neue", "Inter", system-ui, sans-serif;
+  --ff-text: "Inter", "Helvetica Neue", system-ui, sans-serif;
+  --ff-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --ff-cn: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--ff-text), var(--ff-cn);
+  font-feature-settings: "ss01","cv11";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+body { overflow-x: hidden; }
+::selection { background: var(--ink); color: var(--bg); }
+
+.mono { font-family: var(--ff-mono); font-feature-settings: "ss01"; letter-spacing: -0.01em; }
+.cn { font-family: var(--ff-cn); }
+.disp { font-family: var(--ff-disp); letter-spacing: -0.025em; }
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg-2); }
+::-webkit-scrollbar-thumb { background: #c8c2b3; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #a8a290; }
+
+/* Grid background */
+.grid-bg {
+  background-image:
+    linear-gradient(to right, rgba(20,23,28,0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(20,23,28,0.04) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+/* Subtle paper noise */
+.paper::before {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  opacity: 0.025;
+  z-index: 100;
+  background-image: radial-gradient(circle at 1px 1px, rgba(20,23,28,0.4) 1px, transparent 0);
+  background-size: 4px 4px;
+}
+
+/* Nav */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 32px;
+  backdrop-filter: blur(14px) saturate(140%);
+  background: rgba(247,245,240,0.72);
+  border-bottom: 1px solid var(--line-2);
+  transition: padding .3s ease, background .3s ease;
+}
+.nav.compact { padding: 10px 32px; background: rgba(247,245,240,0.92); }
+.nav-logo { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+.nav-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ink); position: relative; }
+.nav-dot::after { content:""; position:absolute; inset:-4px; border-radius:50%; border:1px solid var(--ink); opacity:.3; }
+.nav-links { display: flex; gap: 6px; align-items: center; }
+.nav-link {
+  position: relative;
+  padding: 8px 14px; font-size: 13px;
+  color: var(--ink-3); cursor: pointer;
+  border-radius: 999px; transition: all .25s ease;
+  display: flex; gap: 8px; align-items: center;
+}
+.nav-link:hover { color: var(--ink); }
+.nav-link.active { color: var(--bg); background: var(--ink); }
+.nav-link .num { font-family: var(--ff-mono); font-size: 10px; opacity: .5; }
+.nav-link.active .num { opacity: .8; }
+.nav-cta {
+  font-family: var(--ff-mono); font-size: 11px;
+  padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px;
+  display: flex; gap: 8px; align-items: center;
+}
+.live-dot { width:6px; height:6px; border-radius:50%; background: var(--good); box-shadow: 0 0 0 0 rgba(47,125,91,.6); animation: pulse 1.6s infinite; }
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(47,125,91,.6); }
+  70% { box-shadow: 0 0 0 8px rgba(47,125,91,0); }
+  100% { box-shadow: 0 0 0 0 rgba(47,125,91,0); }
+}
+
+/* Section base */
+section { position: relative; padding: 120px 32px; }
+.container { max-width: 1440px; margin: 0 auto; }
+.section-tag {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--ff-mono); font-size: 11px;
+  color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: 24px;
+}
+.section-tag::before { content:""; width: 24px; height: 1px; background: var(--ink-3); }
+
+.h-display { font-size: clamp(48px, 8vw, 128px); line-height: 0.92; font-weight: 500; letter-spacing: -0.04em; }
+.h1 { font-size: clamp(40px, 5vw, 72px); line-height: 1.0; font-weight: 500; letter-spacing: -0.03em; }
+.h2 { font-size: clamp(28px, 3vw, 44px); line-height: 1.1; font-weight: 500; letter-spacing: -0.02em; }
+.h3 { font-size: 22px; line-height: 1.25; font-weight: 500; letter-spacing: -0.01em; }
+.body-lg { font-size: 18px; line-height: 1.55; color: var(--ink-2); }
+.body { font-size: 15px; line-height: 1.6; color: var(--ink-2); }
+.caption { font-size: 12px; line-height: 1.5; color: var(--ink-3); }
+
+/* Card */
+.card {
+  background: var(--bg-3);
+  border: 1px solid var(--line-2);
+  border-radius: 14px;
+  padding: 24px;
+  transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+}
+.card:hover { border-color: var(--line); box-shadow: 0 24px 60px -28px rgba(20,23,28,0.18); }
+.card-glass {
+  background: linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.7) 100%);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.8);
+  border-radius: 14px;
+}
+
+/* Hero */
+.hero {
+  min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+  position: relative; overflow: hidden;
+  padding: 120px 32px 80px;
+}
+.hero-eyebrow {
+  font-family: var(--ff-mono); font-size: 11px;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--ink-3);
+  display: flex; gap: 14px; align-items: center;
+  margin-bottom: 32px;
+}
+.hero-marquee {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  border-top: 1px solid var(--line-2);
+  background: var(--bg-2);
+  overflow: hidden; padding: 14px 0;
+}
+.hero-marquee-track {
+  display: flex; gap: 60px; white-space: nowrap;
+  font-family: var(--ff-mono); font-size: 12px; color: var(--ink-3);
+  animation: marquee 60s linear infinite;
+}
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Cursor */
+.cursor-ring {
+  position: fixed; pointer-events: none; z-index: 200;
+  width: 28px; height: 28px;
+  border: 1px solid var(--ink); border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: transform .12s ease, width .2s ease, height .2s ease, background .2s ease;
+  mix-blend-mode: difference;
+  filter: invert(1);
+}
+.cursor-dot {
+  position: fixed; pointer-events: none; z-index: 201;
+  width: 4px; height: 4px; background: var(--ink); border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Bubble chart */
+.bubble-chart-wrap { position: relative; height: 640px; background: var(--bg-3); border-radius: 16px; border: 1px solid var(--line-2); overflow: hidden; }
+.bubble {
+  position: absolute; border-radius: 50%;
+  cursor: pointer;
+  transition: transform .35s cubic-bezier(.2,.8,.2,1), filter .25s, opacity .25s;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 11px; font-weight: 500;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+.bubble:hover { filter: brightness(1.1); transform: scale(1.08); z-index: 10; }
+.bubble.dim { opacity: 0.18; }
+
+/* Buttons / chips */
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; font-size: 12px;
+  border: 1px solid var(--line); border-radius: 999px;
+  background: var(--bg-3); cursor: pointer;
+  transition: all .2s;
+  font-family: var(--ff-mono);
+  color: var(--ink-3);
+}
+.chip:hover { border-color: var(--ink); color: var(--ink); }
+.chip.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+/* Reveal on scroll */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity .9s ease, transform .9s cubic-bezier(.2,.8,.2,1); }
+.reveal.in { opacity: 1; transform: translateY(0); }
+
+/* Number ticker */
+.stat { display: flex; flex-direction: column; gap: 6px; }
+.stat-num { font-size: 56px; font-weight: 500; letter-spacing: -0.03em; line-height: 1; font-family: var(--ff-disp); }
+.stat-lbl { font-family: var(--ff-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3); }
+
+/* Bars */
+.bar-row { display: grid; grid-template-columns: 130px 1fr 90px; gap: 16px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line-2); }
+.bar-row:last-child { border-bottom: none; }
+.bar-track { height: 8px; background: var(--bg-2); border-radius: 4px; overflow: hidden; position: relative; }
+.bar-fill { height: 100%; border-radius: 4px; transition: width 1.2s cubic-bezier(.2,.8,.2,1); }
+
+/* Sparkline */
+.spark { display: inline-flex; height: 28px; }
+
+/* Map (Europe) */
+.eu-map { background: var(--bg-3); border-radius: 16px; padding: 16px; }
+
+/* Tooltip */
+.tt {
+  position: fixed; pointer-events: none; z-index: 300;
+  background: var(--ink); color: var(--bg);
+  padding: 10px 12px; border-radius: 8px; font-size: 12px;
+  font-family: var(--ff-mono); transform: translate(-50%, -120%);
+  white-space: nowrap;
+  box-shadow: 0 12px 30px -10px rgba(0,0,0,0.4);
+}
+
+/* Section divider */
+.divider {
+  height: 1px; background: var(--line-2); margin: 0 auto;
+  max-width: 1440px;
+}
+
+/* Tabs */
+.tabs { display: flex; gap: 4px; padding: 4px; background: var(--bg-2); border-radius: 999px; width: fit-content; }
+.tab { padding: 8px 16px; font-size: 13px; border-radius: 999px; cursor: pointer; transition: all .2s; color: var(--ink-3); }
+.tab:hover { color: var(--ink); }
+.tab.active { background: var(--bg-3); color: var(--ink); box-shadow: 0 2px 8px -2px rgba(0,0,0,0.08); }
+
+/* Footer */
+footer {
+  background: var(--ink); color: var(--bg);
+  padding: 80px 32px 32px;
+}
+footer .container { max-width: 1440px; margin: 0 auto; }
+.footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; padding-bottom: 60px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+
+/* Gauge / radial */
+.radial-track { stroke: rgba(20,23,28,0.08); }
+.radial-fill { transition: stroke-dashoffset 1.5s cubic-bezier(.2,.8,.2,1); }
+
+/* 3D scene canvas */
+.scene-canvas { position: absolute; inset: 0; pointer-events: none; }
+
+/* Magnetic hover */
+.magnet { transition: transform .3s cubic-bezier(.2,.8,.2,1); }
+
+/* Marquee model bar */
+.model-bar {
+  display: flex; gap: 32px; padding: 18px 0;
+  border-top: 1px solid var(--line-2); border-bottom: 1px solid var(--line-2);
+  background: var(--bg-2);
+  overflow: hidden;
+}
+
+/* Pain heat */
+.heat-cell {
+  border-radius: 6px; padding: 12px;
+  transition: transform .25s, box-shadow .25s;
+  cursor: pointer;
+}
+.heat-cell:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -12px rgba(0,0,0,0.18); }
+
+/* Marquee numbers */
+.kpi-strip {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--line-2); border-bottom: 1px solid var(--line-2);
+  padding: 36px 0;
+}
+.kpi-strip > div + div { border-left: 1px solid var(--line-2); }
+.kpi-strip > div { padding: 0 32px; }
+
+/* Lenis-like smooth scrolling — we'll use rAF dampening */
+html.has-smooth { scroll-behavior: auto; }
+
+/* Loader */
+.loader { position: fixed; inset:0; background: var(--bg); z-index: 999; display:flex; align-items:center; justify-content:center; }
+.loader-bar { width: 240px; height: 1px; background: var(--line); position: relative; overflow: hidden; }
+.loader-bar::after { content:""; position:absolute; inset:0; background: var(--ink); transform-origin: left; animation: load 1.4s cubic-bezier(.2,.8,.2,1); }
+@keyframes load { 0% { transform: scaleX(0);} 100% { transform: scaleX(1);} }
+
+  </style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<!-- =============================================================
+  依赖库 (Third-party Libraries via CDN)
+  · React 18.2        — UI runtime
+  · ReactDOM 18.2     — DOM renderer
+  · Babel Standalone 7.23  — in-browser JSX transpiler
+  · html2canvas 1.4.1 — 截图导出图片
+  · SheetJS 0.18.5    — 导出 Excel (.xlsx)
+============================================================= -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- =============================================================
+  数据层 — EV Market Data (window.MARKET_DATA · RD_DATA · PAIN_DATA · COMPETE_DATA)
+============================================================= -->
+<script>
+// EV market data — Europe 2025 (EV-Volumes / JATO / ACEA / Autovista24)
+// Numbers reflect best-public-source estimates; figures rounded.
+
+window.MARKET_DATA = {
+  // Bubble chart pool: x=price (€k), y=kWh, r=sales, color=power
+  // `region` now means: which European country market this car is a top-seller in
+  // (a model can appear in several country lists — see country.topSellers below)
+  bubbles: [
+    { id:"model-y",   model:"Model Y",        brand:"Tesla",    seg:"D-SUV",  power:"BEV",  price:46,  sales:150605, kwh:75 },
+    { id:"model-3",   model:"Model 3",        brand:"Tesla",    seg:"D-Sedan",power:"BEV",  price:42,  sales:94087,  kwh:60 },
+    { id:"id4",       model:"ID.4 / ID.5",    brand:"VW",       seg:"C-SUV",  power:"BEV",  price:42,  sales:88420,  kwh:77 },
+    { id:"id3",       model:"ID.3",           brand:"VW",       seg:"C-Hatch",power:"BEV",  price:37,  sales:71200,  kwh:58 },
+    { id:"id7",       model:"ID.7 / Tourer",  brand:"VW",       seg:"D-Sedan",power:"BEV",  price:53,  sales:42180,  kwh:77 },
+    { id:"elroq",     model:"Elroq",          brand:"Skoda",    seg:"B-SUV",  power:"BEV",  price:33,  sales:78140,  kwh:55 },
+    { id:"enyaq",     model:"Enyaq",          brand:"Skoda",    seg:"C-SUV",  power:"BEV",  price:41,  sales:64500,  kwh:77 },
+    { id:"r5",        model:"R5 E-Tech",      brand:"Renault",  seg:"B-Hatch",power:"BEV",  price:25,  sales:84300,  kwh:52 },
+    { id:"megane",    model:"Megane E-Tech",  brand:"Renault",  seg:"C-Hatch",power:"BEV",  price:36,  sales:38900,  kwh:60 },
+    { id:"ec3",       model:"ë-C3",           brand:"Citroën",  seg:"B-Hatch",power:"BEV",  price:23,  sales:52800,  kwh:44 },
+    { id:"ev3",       model:"EV3",            brand:"Kia",      seg:"B-SUV",  power:"BEV",  price:36,  sales:72400,  kwh:58 },
+    { id:"e208",      model:"e-208",          brand:"Peugeot",  seg:"B-Hatch",power:"BEV",  price:28,  sales:56200,  kwh:51 },
+    { id:"500e",      model:"500e",           brand:"Fiat",     seg:"A-Hatch",power:"BEV",  price:25,  sales:39400,  kwh:42 },
+    { id:"mg4",       model:"MG4 EV",         brand:"MG",       seg:"C-Hatch",power:"BEV",  price:27,  sales:51600,  kwh:64 },
+    { id:"ex30",      model:"EX30",           brand:"Volvo",    seg:"B-SUV",  power:"BEV",  price:36,  sales:54800,  kwh:69 },
+    { id:"bz4x",      model:"bZ4X",           brand:"Toyota",   seg:"C-SUV",  power:"BEV",  price:42,  sales:21900,  kwh:71 },
+    { id:"ioniq5",    model:"Ioniq 5",        brand:"Hyundai",  seg:"C-SUV",  power:"BEV",  price:45,  sales:41800,  kwh:77 },
+    { id:"inster",    model:"Inster",         brand:"Hyundai",  seg:"A-Hatch",power:"BEV",  price:24,  sales:34600,  kwh:42 },
+    { id:"q4etron",   model:"Q4 e-tron",      brand:"Audi",     seg:"C-SUV",  power:"BEV",  price:53,  sales:62550,  kwh:77 },
+    { id:"q6etron",   model:"Q6 e-tron",      brand:"Audi",     seg:"D-SUV",  power:"BEV",  price:71,  sales:57250,  kwh:94 },
+    { id:"i4",        model:"i4",             brand:"BMW",      seg:"D-Sedan",power:"BEV",  price:58,  sales:38900,  kwh:81 },
+    { id:"ix1",       model:"iX1",            brand:"BMW",      seg:"C-SUV",  power:"BEV",  price:48,  sales:46100,  kwh:65 },
+  ],
+
+  // ---- COUNTRY top-sellers (replaces region filter) ----------------------
+  // For each country: top-selling EV models with the *why*.
+  countryTops: [
+    {
+      code:"DE", name:"Germany", flag:"🇩🇪", units:572000,
+      headline:"VW 集团的绝对主场 · 本土品牌忠诚度极高",
+      tops: [
+        { model:"VW ID.7 / Tourer", units:34000, why:"旅行版 (Tourer) 完美契合德国人无限速高速 + 周末长途装载场景 · 大众品牌+本土制造 · 800V 175kW 快充 · 企业税优 1% rule" },
+        { model:"VW ID.3",          units:31000, why:"紧凑型代步主力，主要靠企业车队 / 租赁订单 · €37k 起售 + 本土补贴叠加 · 第二代软件解决了 ID.3 mk1 痼疾" },
+        { model:"VW ID.4 / ID.5",   units:26000, why:"家庭首选中型纯电 SUV · MEB 平台空间利用率 · 4Motion 双电机版本契合家庭长途 · 二手保值率超 Tesla" },
+        { model:"Tesla Model Y",    units:24000, why:"柏林工厂生产享本地补贴 + 超充网络 · 但 2025 被 VW 集团'机海战术'挤到第四 · 价格战让 RWD 跌破 €43k" },
+        { model:"Skoda Enyaq",      units:22500, why:"与 ID.4 同 MEB 平台但空间更大 · 性价比比 VW 高 €3-5k · 务实家庭刚需车" },
+      ],
+    },
+    {
+      code:"FR", name:"France", flag:"🇫🇷", units:336000,
+      headline:"本土微型/小型车的天下 · 生态奖金保护",
+      tops: [
+        { model:"Renault R5 E-Tech", units:42800, why:"2025 现象级爆款 · €25k 起、复古设计 + 法国生产享 €4k 生态奖金（碳足迹审查友好）· 直接横扫" },
+        { model:"Peugeot e-208",     units:24300, why:"曾经的法国霸主，受 R5 冲击退居次席 · 城市代步经典 · 法国本土生产 + Stellantis 渠道深耕" },
+        { model:"Tesla Model Y",     units:18900, why:"唯一杀入法国前五的中大型车 · 柏林工厂生产符合法国补贴标准 · 强品牌号召力" },
+        { model:"Renault Megane E-Tech", units:17200, why:"本土紧凑型主推车 · CMF-EV 平台、操控偏运动 · 雷诺品牌主场叠加生态奖金" },
+        { model:"Fiat 500e",         units:14600, why:"Stellantis 经典复古微型车 · 时尚 + 易停车 · 都市轻奢消费群体首选" },
+      ],
+    },
+    {
+      code:"UK", name:"United Kingdom", flag:"🇬🇧", units:447000,
+      headline:"极度多元化的高地 · 无强势本土大众车企，性价比+设计为王",
+      tops: [
+        { model:"Tesla Model Y",  units:38200, why:"中产家庭用车标杆 · OTA + 超充网络 + 残值 · 英国对所有品牌最开放的市场" },
+        { model:"MG4 EV",         units:31500, why:"上汽 MG 在英国深厚品牌底蕴 · MSP 纯电平台底盘扎实 · €27k 极致性价比 · 7 年质保安心" },
+        { model:"Tesla Model 3",  units:24800, why:"焕新版吸收喜欢轿车操控的消费者 · 价格战后下探至 €40k 区间 · 续航实测领先" },
+        { model:"Volvo EX30",     units:23100, why:"吉利 SEA 浩瀚架构底子 + 北欧极简设计 · 年轻群体心头好 · 中国生产但 Volvo 品牌溢价" },
+        { model:"BMW i4",         units:21700, why:"英国豪华品牌基本盘稳 · 后驱操控 + iDrive 8 体验 · 企业用户首选" },
+      ],
+    },
+    {
+      code:"NO", name:"Norway", flag:"🇳🇴", units:172000,
+      headline:"BEV 渗透率 96% 的终极形态 · 偏爱大空间 + 四驱 SUV",
+      tops: [
+        { model:"Tesla Model Y",      units:26400, why:"挪威断层领先销冠 · 超充网络 + 价格透明 + 软件迭代 · 挪威人不需要油车，Y 直接当家庭主力" },
+        { model:"VW ID.4 / ID.5",     units:14200, why:"双电机 GTX 版四驱契合冰雪 · MEB 热泵标配 + 空间大 · 大众品牌可靠性认知" },
+        { model:"Skoda Enyaq",        units:12800, why:"理由同德国 · 空间充裕 · 适合挪威家庭长途 · 性价比超 ID.4" },
+        { model:"Toyota bZ4X",        units:9200,  why:"丰田四驱口碑 + 可靠性光环在挪威极强 · 全球其他市场表现一般，挪威是例外" },
+        { model:"Volvo EX30 / XC40",  units:8900,  why:"北欧自家品牌 · 本土气候适应性极强 · 安全配置默认拉满" },
+      ],
+    },
+  ],
+
+  // Country share — for hero kpi strip
+  countries: [
+    { code:"DE", name:"Germany",         share:18.2, growth:43.0, units:572000 },
+    { code:"UK", name:"United Kingdom",  share:17.3, growth:21.4, units:447000 },
+    { code:"FR", name:"France",          share:13.0, growth:8.2,  units:336000 },
+    { code:"NO", name:"Norway",          share:6.6,  growth:50.7, units:172000 },
+    { code:"NL", name:"Netherlands",     share:6.1,  growth:20.6, units:158000 },
+    { code:"BE", name:"Belgium",         share:5.6,  growth:12.6, units:144000 },
+    { code:"SE", name:"Sweden",          share:4.1,  growth:-3.1, units:106000 },
+    { code:"DK", name:"Denmark",         share:3.8,  growth:34.0, units:98000 },
+    { code:"IT", name:"Italy",           share:3.4,  growth:46.0, units:88000 },
+    { code:"ES", name:"Spain",           share:3.2,  growth:62.0, units:83000 },
+  ],
+
+  brands: [
+    { name:"Volkswagen", bev:282900, phev:148000, growth:78,  flag:"#0a3d62" },
+    { name:"Tesla",      bev:238511, phev:0,      growth:-27, flag:"#1a1a1a" },
+    { name:"Audi",       bev:229898, phev:62000,  growth:33,  flag:"#922b21" },
+    { name:"Skoda",      bev:212721, phev:48000,  growth:109, flag:"#1e6091" },
+    { name:"BMW",        bev:208400, phev:118000, growth:18,  flag:"#0e6655" },
+    { name:"Renault",    bev:167200, phev:22000,  growth:64,  flag:"#b8860b" },
+    { name:"Kia",        bev:158600, phev:34000,  growth:62,  flag:"#117864" },
+    { name:"Hyundai",    bev:142300, phev:18000,  growth:31,  flag:"#1f618d" },
+    { name:"Mercedes",   bev:138900, phev:96000,  growth:24,  flag:"#212121" },
+    { name:"Volvo",      bev:108200, phev:124000, growth:-13, flag:"#5d4037" },
+    { name:"BYD",        bev:84600,  phev:62000,  growth:212, flag:"#c0392b" },
+    { name:"Citroën",    bev:78900,  phev:8000,   growth:84,  flag:"#7d3c98" },
+  ],
+
+  mix: [
+    { year:2021, bev:9.1,  phev:8.5,  hev:19.6, ice:62.8 },
+    { year:2022, bev:12.1, phev:9.4,  hev:22.6, ice:55.9 },
+    { year:2023, bev:14.6, phev:7.7,  hev:25.8, ice:51.9 },
+    { year:2024, bev:13.6, phev:7.1,  hev:30.9, ice:48.4 },
+    { year:2025, bev:19.5, phev:9.6,  hev:34.5, ice:36.4 },
+  ],
+
+  drivers: [
+    { tag:"政策补贴", title:"德国新能源补贴重启", lift:"+43%", body:"德国2025年BEV销量同比增长43%，主因为联邦层面针对25,000欧元以下电动车的购置补贴在2025Q2恢复，叠加企业用车税收减免，激活了被压抑12个月的需求。" },
+    { tag:"价格民主化", title:"€20k 电动小车浪潮", lift:"+161%", body:"Renault 5 / Citroën ë-C3 / Dacia Spring 等A0-B级电动车将BEV起售价压至2万欧元区间，波兰等新兴市场BEV销量同比+161%。" },
+    { tag:"商业模式", title:"企业租赁与换电生态", lift:"+50%", body:"挪威2025年BEV占新车销售96%，企业车队税收差使BEV持有成本远低于ICE；NIO在欧洲铺设2,300+换电站重塑补能心智。" },
+    { tag:"中国品牌", title:"BYD 欧洲爆发", lift:"+311%", body:"BYD 2025上半年欧洲销量同比+311%，Seal U PHEV与Tiguan PHEV并列6月PHEV销冠，本地化生产+大单品策略。" },
+    { tag:"产品周期", title:"VW Group 反扑", lift:"+78%", body:"Skoda Elroq、VW ID.7 与 Audi Q6 e-tron 三款新车支撑VW集团BEV销量+78%，集团重夺欧洲电动车销冠。" },
+  ],
+};
+
+// =============================================================================
+// BEV 各级别销量前十排行数据 (2025 Europe · EV-Volumes)
+// seg: A/B/C/D/E · type: CAR/SUV
+// =============================================================================
+window.BEV_RANK_DATA = [
+  // ─── A-CAR ───
+  { seg:"A", type:"CAR", rank:1,  brand:"Fiat",       model:"500 electric",    sales:20708, kwh:40.2, range:285,   price:28    },
+  { seg:"A", type:"CAR", rank:2,  brand:"LeapMotor",  model:"T03",             sales:20255, kwh:41.3, range:403,   price:18.9  },
+  { seg:"A", type:"CAR", rank:3,  brand:"Volkswagen", model:"e-Up!",           sales:826,   kwh:36.8, range:260,   price:26    },
+  { seg:"A", type:"CAR", rank:4,  brand:"DR",         model:"DR1",             sales:797,   kwh:30.7, range:301,   price:25.9  },
+  { seg:"A", type:"CAR", rank:5,  brand:"smart",      model:"Fortwo ED",       sales:647,   kwh:17.6, range:128.7, price:25    },
+  { seg:"A", type:"CAR", rank:6,  brand:"Citroën",    model:"Ami",             sales:561,   kwh:5.5,  range:70,    price:7.99  },
+  { seg:"A", type:"CAR", rank:7,  brand:"Skoda",      model:"Citigo-e iV",     sales:536,   kwh:36.8, range:265,   price:22    },
+  { seg:"A", type:"CAR", rank:8,  brand:"Renault",    model:"Twingo ZE",       sales:299,   kwh:22,   range:250,   price:20    },
+  { seg:"A", type:"CAR", rank:9,  brand:"Fiat",       model:"Topolino",        sales:107,   kwh:5.5,  range:75,    price:9.89  },
+  { seg:"A", type:"CAR", rank:10, brand:"smart",      model:"ForFour ED",      sales:55,    kwh:17.6, range:155,   price:22.6  },
+  // ─── B-CAR ───
+  { seg:"B", type:"CAR", rank:1,  brand:"Kia",        model:"EV3",             sales:66349, kwh:69.9, range:519.8, price:36    },
+  { seg:"B", type:"CAR", rank:2,  brand:"Peugeot",    model:"e-208",           sales:26642, kwh:51.9, range:368.3, price:34    },
+  { seg:"B", type:"CAR", rank:3,  brand:"MINI",       model:"Cooper E",        sales:19090, kwh:40.7, range:293,   price:32.9  },
+  { seg:"B", type:"CAR", rank:4,  brand:"MINI",       model:"Cooper SE",       sales:19030, kwh:54.2, range:387,   price:36.9  },
+  { seg:"B", type:"CAR", rank:5,  brand:"Opel",       model:"Corsa-e",         sales:14794, kwh:51.8, range:375.6, price:34    },
+  { seg:"B", type:"CAR", rank:6,  brand:"BYD",        model:"Dolphin (海豚)",  sales:14120, kwh:44.9, range:405,   price:29.99 },
+  { seg:"B", type:"CAR", rank:7,  brand:"smart",      model:"#1",              sales:5431,  kwh:57.7, range:420.5, price:37.49 },
+  { seg:"B", type:"CAR", rank:8,  brand:"Great Wall", model:"ORA Funky Cat",   sales:1751,  kwh:47.8, range:401,   price:38.99 },
+  { seg:"B", type:"CAR", rank:9,  brand:"Lancia",     model:"YPSILON EV",      sales:1207,  kwh:51,   range:403,   price:34.9  },
+  { seg:"B", type:"CAR", rank:10, brand:"Renault",    model:"Zoe",             sales:940,   kwh:52,   range:389.5, price:35    },
+  // ─── C-CAR ───
+  { seg:"C", type:"CAR", rank:1,  brand:"Volkswagen", model:"ID.3",            sales:79711, kwh:58,   range:430,   price:39.99 },
+  { seg:"C", type:"CAR", rank:2,  brand:"CUPRA",      model:"Born",            sales:43338, kwh:69.8, range:395.6, price:40    },
+  { seg:"C", type:"CAR", rank:3,  brand:"MG",         model:"MG4",             sales:26718, kwh:61.4, range:400,   price:31.99 },
+  { seg:"C", type:"CAR", rank:4,  brand:"Renault",    model:"Megane E-Tech",   sales:19118, kwh:52.1, range:396.5, price:38    },
+  { seg:"C", type:"CAR", rank:5,  brand:"Opel",       model:"Frontera BEV",    sales:14507, kwh:47.7, range:347.2, price:29    },
+  { seg:"C", type:"CAR", rank:6,  brand:"Mercedes",   model:"CLA BEV",         sales:14293, kwh:90,   range:792,   price:50    },
+  { seg:"C", type:"CAR", rank:7,  brand:"Opel",       model:"Astra BEV",       sales:3834,  kwh:54,   range:416,   price:39.9  },
+  { seg:"C", type:"CAR", rank:8,  brand:"Peugeot",    model:"e-308",           sales:3809,  kwh:54,   range:410,   price:43    },
+  { seg:"C", type:"CAR", rank:9,  brand:"Nissan",     model:"LEAF",            sales:1692,  kwh:61.7, range:362.4, price:35    },
+  { seg:"C", type:"CAR", rank:10, brand:"MG",         model:"MG5",             sales:1469,  kwh:52.5, range:344,   price:35.49 },
+  // ─── D-CAR ───
+  { seg:"D", type:"CAR", rank:1,  brand:"Tesla",      model:"Model 3",         sales:86186, kwh:71.4, range:615.4, price:42.99 },
+  { seg:"D", type:"CAR", rank:2,  brand:"BMW",        model:"i4",              sales:39875, kwh:77.1, range:438.5, price:57    },
+  { seg:"D", type:"CAR", rank:3,  brand:"BYD",        model:"SEAL Atto4",      sales:20227, kwh:82.6, range:675,   price:44.9  },
+  { seg:"D", type:"CAR", rank:4,  brand:"Polestar",   model:"POLESTAR 2",      sales:16207, kwh:75.6, range:461.9, price:48.99 },
+  { seg:"D", type:"CAR", rank:5,  brand:"OMODA",      model:"OMODA 5",         sales:8569,  kwh:53.6, range:401,   price:37    },
+  { seg:"D", type:"CAR", rank:6,  brand:"Hyundai",    model:"IONIQ 6",         sales:5654,  kwh:77.4, range:567,   price:44    },
+  { seg:"D", type:"CAR", rank:7,  brand:"Kia",        model:"EV4",             sales:4337,  kwh:69.9, range:470.6, price:40    },
+  { seg:"D", type:"CAR", rank:8,  brand:"LeapMotor",  model:"B10",             sales:3276,  kwh:56.2, range:510,   price:30    },
+  { seg:"D", type:"CAR", rank:9,  brand:"MG",         model:"Cyberster",       sales:1845,  kwh:77,   range:444,   price:60    },
+  { seg:"D", type:"CAR", rank:10, brand:"DS",         model:"DS N°4",          sales:488,   kwh:61,   range:450,   price:40    },
+  // ─── E-CAR ───
+  { seg:"E", type:"CAR", rank:1,  brand:"Volkswagen", model:"ID.7",            sales:75984, kwh:86.6, range:665.5, price:56.99 },
+  { seg:"E", type:"CAR", rank:2,  brand:"Audi",       model:"A6 e-tron",       sales:29380, kwh:100,  range:720,   price:75    },
+  { seg:"E", type:"CAR", rank:3,  brand:"Mercedes",   model:"EQE",             sales:15486, kwh:90,   range:660,   price:67    },
+  { seg:"E", type:"CAR", rank:4,  brand:"Porsche",    model:"Taycan EV",       sales:7463,  kwh:104.8,range:573.5, price:101   },
+  { seg:"E", type:"CAR", rank:5,  brand:"Mazda",      model:"6e",              sales:7039,  kwh:68.8, range:479,   price:45    },
+  { seg:"E", type:"CAR", rank:6,  brand:"IM Motors",  model:"IM 5",            sales:549,   kwh:100,  range:660,   price:50    },
+  { seg:"E", type:"CAR", rank:7,  brand:"NIO",        model:"ET5",             sales:542,   kwh:80,   range:590,   price:47.5  },
+  { seg:"E", type:"CAR", rank:8,  brand:"Tesla",      model:"Model S",         sales:540,   kwh:85,   range:442.6, price:94.99 },
+  { seg:"E", type:"CAR", rank:9,  brand:"Volvo",      model:"ES90",            sales:308,   kwh:98.8, range:509.3, price:80    },
+  { seg:"E", type:"CAR", rank:10, brand:"Lucid",      model:"Lucid Air",       sales:306,   kwh:118,  range:797,   price:85    },
+  // ─── A-SUV ───
+  { seg:"A", type:"SUV", rank:1,  brand:"Dacia",      model:"Spring Electric", sales:33886, kwh:26.8, range:225,   price:16.9  },
+  { seg:"A", type:"SUV", rank:2,  brand:"Hyundai",    model:"Casper EV",       sales:32885, kwh:49,   range:278,   price:23    },
+  { seg:"A", type:"SUV", rank:3,  brand:"Alpine",     model:"A290",            sales:7922,  kwh:55,   range:400,   price:38    },
+  { seg:"A", type:"SUV", rank:4,  brand:"Dongfeng",   model:"Nano Box",        sales:896,   kwh:16,   range:201,   price:16    },
+  // ─── B-SUV ───
+  { seg:"B", type:"SUV", rank:1,  brand:"Renault",    model:"R5 E-Tech",       sales:82835, kwh:49.1, range:360.5, price:25    },
+  { seg:"B", type:"SUV", rank:2,  brand:"Volvo",      model:"EX30",            sales:48950, kwh:62.5, range:457.4, price:36    },
+  { seg:"B", type:"SUV", rank:3,  brand:"Citroën",    model:"ë-C3",            sales:48769, kwh:44,   range:314.3, price:23.3  },
+  { seg:"B", type:"SUV", rank:4,  brand:"Hyundai",    model:"Kona EV",         sales:32511, kwh:56.8, range:364.6, price:40    },
+  { seg:"B", type:"SUV", rank:5,  brand:"Peugeot",    model:"e-2008",          sales:23114, kwh:50,   range:310,   price:38    },
+  { seg:"B", type:"SUV", rank:6,  brand:"BYD",        model:"Seagull (海鸥)",  sales:21891, kwh:38.9, range:405,   price:20    },
+  { seg:"B", type:"SUV", rank:7,  brand:"MINI",       model:"Aceman",          sales:18067, kwh:51.5, range:406,   price:34    },
+  { seg:"B", type:"SUV", rank:8,  brand:"Renault",    model:"R4 E-Tech",       sales:13636, kwh:55,   range:409,   price:30    },
+  { seg:"B", type:"SUV", rank:9,  brand:"MG",         model:"ZS EV",           sales:9987,  kwh:50.3, range:335,   price:33.99 },
+  { seg:"B", type:"SUV", rank:10, brand:"BYD",        model:"Yuan UP",         sales:8318,  kwh:45.1, range:401,   price:30    },
+  // ─── C-SUV ───
+  { seg:"C", type:"SUV", rank:1,  brand:"Skoda",      model:"ELROQ",           sales:93606, kwh:75.5, range:392,   price:33    },
+  { seg:"C", type:"SUV", rank:2,  brand:"Skoda",      model:"ENYAQ",           sales:78824, kwh:75,   range:500,   price:44    },
+  { seg:"C", type:"SUV", rank:3,  brand:"Volkswagen", model:"ID.4",            sales:71405, kwh:72.1, range:535.2, price:40    },
+  { seg:"C", type:"SUV", rank:4,  brand:"Audi",       model:"Q4 e-tron",       sales:62337, kwh:75.1, range:524.5, price:52    },
+  { seg:"C", type:"SUV", rank:5,  brand:"BMW",        model:"iX1",             sales:59170, kwh:64.7, range:438,   price:47    },
+  { seg:"C", type:"SUV", rank:6,  brand:"Ford",       model:"Explorer EV",     sales:43840, kwh:82,   range:566,   price:42    },
+  { seg:"C", type:"SUV", rank:7,  brand:"Mercedes",   model:"EQA",             sales:41484, kwh:66.5, range:355,   price:50    },
+  { seg:"C", type:"SUV", rank:8,  brand:"CUPRA",      model:"Tavascan",        sales:35608, kwh:77,   range:547,   price:46    },
+  { seg:"C", type:"SUV", rank:9,  brand:"Volvo",      model:"XC40 Recharge",   sales:34681, kwh:80.1, range:399.9, price:47    },
+  { seg:"C", type:"SUV", rank:10, brand:"Mercedes",   model:"EQB",             sales:34019, kwh:66.5, range:370.1, price:53    },
+  // ─── D-SUV ───
+  { seg:"D", type:"SUV", rank:1,  brand:"Tesla",      model:"Model Y",         sales:154394,kwh:72,   range:597.1, price:44.99 },
+  { seg:"D", type:"SUV", rank:2,  brand:"Renault",    model:"Scenic EV",       sales:37766, kwh:78.9, range:530.5, price:40    },
+  { seg:"D", type:"SUV", rank:3,  brand:"Hyundai",    model:"IONIQ 5",         sales:24408, kwh:83.3, range:480.7, price:43    },
+  { seg:"D", type:"SUV", rank:4,  brand:"Kia",        model:"EV6",             sales:17611, kwh:81.2, range:479.8, price:46    },
+  { seg:"D", type:"SUV", rank:5,  brand:"Ford",       model:"CAPRI EV",        sales:17506, kwh:68.6, range:506.2, price:45    },
+  { seg:"D", type:"SUV", rank:6,  brand:"Xiaopeng",   model:"G6",              sales:14605, kwh:77.9, range:561.9, price:40    },
+  { seg:"D", type:"SUV", rank:7,  brand:"Peugeot",    model:"e-5008",          sales:10861, kwh:77,   range:502,   price:46    },
+  { seg:"D", type:"SUV", rank:8,  brand:"Opel",       model:"GRANDLAND EV",    sales:8509,  kwh:86,   range:583,   price:45    },
+  { seg:"D", type:"SUV", rank:9,  brand:"Ford",       model:"Mustang Mach-E",  sales:6251,  kwh:85.4, range:417.4, price:50    },
+  { seg:"D", type:"SUV", rank:10, brand:"LeapMotor",  model:"C10",             sales:6114,  kwh:69.9, range:530,   price:36    },
+  // ─── E-SUV ───
+  { seg:"E", type:"SUV", rank:1,  brand:"Audi",       model:"Q6 e-tron",       sales:56431, kwh:100,  range:600,   price:74    },
+  { seg:"E", type:"SUV", rank:2,  brand:"Polestar",   model:"POLESTAR 4",      sales:26166, kwh:100,  range:600,   price:60    },
+  { seg:"E", type:"SUV", rank:3,  brand:"Porsche",    model:"Macan 4 Electric",sales:22819, kwh:100,  range:612,   price:84    },
+  { seg:"E", type:"SUV", rank:4,  brand:"BYD",        model:"Sea Lion 07",     sales:22324, kwh:79.8, range:604.4, price:50    },
+  { seg:"E", type:"SUV", rank:5,  brand:"BMW",        model:"iX",              sales:16524, kwh:104.5,range:513.1, price:77    },
+  { seg:"E", type:"SUV", rank:6,  brand:"Xiaopeng",   model:"G9",              sales:5789,  kwh:88.5, range:640.5, price:58    },
+  { seg:"E", type:"SUV", rank:7,  brand:"Lexus",      model:"RZ",              sales:4226,  kwh:71.4, range:315,   price:68    },
+  { seg:"E", type:"SUV", rank:8,  brand:"Mercedes",   model:"EQE SUV",         sales:3317,  kwh:90.6, range:538,   price:83    },
+  { seg:"E", type:"SUV", rank:9,  brand:"ZEEKR",      model:"7X",              sales:3191,  kwh:91.7, range:620,   price:55    },
+  { seg:"E", type:"SUV", rank:10, brand:"Jaguar",     model:"I-Pace",          sales:1791,  kwh:90,   range:386.2, price:81    },
+];
+
+window.BEV_RANK_INSIGHTS = {
+  "A-CAR": {
+    headline:"极致价格民主化：€8–28k 的微型城市先锋",
+    factors:[
+      { icon:"💰", tag:"价格壁垒突破", text:"Fiat 500e (€28k) 与 LeapMotor T03 (€18.9k) 分庭抗礼，两者合计占 A-CAR 市场 92% 销量。Ami (€7.99k) 以'四轮轻便摩托车'身份规避 BEV 认证门槛，打开了前所未有的超低价入门通道。" },
+      { icon:"🏙️", tag:"城市场景高度匹配", text:"A 级 BEV 核心竞争力是'停得下、充得到、够用就好'：70–403 km 实用续航完全覆盖欧洲城市日均 <50 km 需求，5.5–41 kWh 小容量反而压低了重量与成本。" },
+      { icon:"🏛️", tag:"补贴政策强力驱动", text:"Fiat 500e 意大利生产、LeapMotor T03 为 Stellantis 渠道车型，均可叠加欧洲各国 A 级补贴。法国 Bonus Écologique 对 €25k 以下车型最高 €7,000，有效将落地价压至 €10k 级别。" },
+      { icon:"⚡", tag:"快充成最大痛点", text:"本细分快充功率普遍偏低（DC ≤50 kW），Ami 甚至无 DC 充电。要突破销量天花板，热泵标配与高功率快充将是下一代 A 级的主要差异化方向。" },
+    ]
+  },
+  "B-CAR": {
+    headline:"Kia EV3 一骑绝尘：韩系重新定义 B 级性价比标准",
+    factors:[
+      { icon:"🏆", tag:"EV3 现象级降维打击", text:"EV3 以 66,349 辆碾压第二名 e-208（26,642 辆），领先约 2.5 倍。核心公式：€36k + 69.9 kWh 大电池 + 520 km 超强续航，把 C 级性能定价到 B 级，形成降维打击。" },
+      { icon:"🌍", tag:"欧盟 CO₂ 罚款激活走量需求", text:"2025 年欧盟 CO₂ 合规罚款正式生效，Stellantis/PSA 集团被迫将 B 级列为走量车型冲量，大力铺货 e-208、Corsa-e，但价格让步空间有限，整体被 EV3 的性价比碾压。" },
+      { icon:"🇨🇳", tag:"中国品牌入局重塑竞争基线", text:"BYD Dolphin（€29,990）比 Corsa-e 低 €4,000 仍提供相当规格，首年即进入 Top 6，证明中国电池成本优势在欧洲本土化渠道叠加后依然显著。" },
+      { icon:"🔋", tag:"电量基线已形成", text:"前 5 名全部在 40–70 kWh 区间，低于 40 kWh 的产品销量明显落后，说明 B-CAR 买家已不接受'续航焦虑'，该指标正从加分项变为入场门槛。" },
+    ]
+  },
+  "C-CAR": {
+    headline:"ID.3 主场稳固，MG4 价值杀手，CLA 颠覆性能上限",
+    factors:[
+      { icon:"🏠", tag:"大众集团本土优势碾压", text:"ID.3 (79,711) + CUPRA Born (43,338) 合计超 12 万辆，集团份额超 58%。德国本土生产+欧洲最广经销商网络+企业车队批量订单是护城河。" },
+      { icon:"🇨🇳", tag:"MG4 的价格革命", text:"MG MG4 (€31,990) 比竞品便宜约 €6,000–8,000，仍提供 61.4 kWh + 400 km 续航。在英国市场夺得前列，印证中国制造成本优势足以颠覆欧洲中级车定价体系。" },
+      { icon:"🚀", tag:"Mercedes CLA 的超维度入局", text:"CLA BEV 以 €50k + 90 kWh + 792 km WLTP 续航跻身 Top 6，打破了'C 级就是实用主义'的认知，引入了豪华溢价的全新竞争维度。" },
+      { icon:"📉", tag:"LEAF 的加速衰退", text:"曾为全球最畅销纯电车的 Nissan LEAF 仅余 1,692 辆。CHAdeMO 快充接口孤立于 CCS 生态、平台老化、无热泵，在竞品全面升级下已加速退市。" },
+    ]
+  },
+  "D-CAR": {
+    headline:"Tesla Model 3 的绝对统治：续航×软件×生态三重护城河",
+    factors:[
+      { icon:"⚡", tag:"超充网络是最深护城河", text:"Model 3 以 86,186 辆领跑全 D-CAR，超充网络（欧洲 3,000+ 站、等待时间行业最短）+持续 OTA 迭代+最高二手残值率构成三重护城河。焕新版提升硬件同时价格下探，进一步巩固领先。" },
+      { icon:"🏎️", tag:"BMW i4 的驾驶体验溢价", text:"i4 (€57k) 以后驱操控+iDrive 8 系统打出差异化，吸引不愿让步驾驶乐趣的传统豪华买家。证明传统品牌在高价格段可依靠体验溢价而非价格战取得可观份额。" },
+      { icon:"🇨🇳", tag:"BYD SEAL 的续航攻势", text:"SEAL Atto4 以 82.6 kWh + 675 km 续航 + €44.9k 定价强势切入，位居第 3。在英国市场快速获客，验证了中国品牌在中高端纯电轿车的可行性。" },
+      { icon:"💎", tag:"低价策略效果有限", text:"OMODA 5 (€37k) 与 LeapMotor B10 (€30k) 以低价切入 D-CAR 边缘，但销量远不及前四，说明 D 级消费者对品牌积累有一定门槛，价格让步需配合品牌力建设。" },
+    ]
+  },
+  "E-CAR": {
+    headline:"超豪华纯电：续航不设上限，品牌才是真正入场券",
+    factors:[
+      { icon:"🎯", tag:"ID.7 量价双赢", text:"ID.7 以 €57k + 86.6 kWh + 665 km 续航赢得 75,984 辆（占 E-CAR 55%），旅行版(Tourer)在德国、荷兰长途驾驶市场尤为畅销，证明大众品牌在豪华边界仍具强大渗透力。" },
+      { icon:"📡", tag:"技术旗舰驱动高净值购买", text:"Audi A6 e-tron (€75k/720 km) 和 Taycan (€101k/573 km) 以技术旗舰定位赢得高净值客户。Porsche 品牌在纯电化后溢价几乎未损耗，证明超豪华细分不受价格竞争干扰。" },
+      { icon:"🌐", tag:"中国品牌试水高端困难重重", text:"NIO ET5 (€47.5k) 和 IM Motors IM 5 (€50k) 尝试进入 E-CAR，销量分别仅 542 和 549 辆，说明欧洲豪华车买家对品牌历史积累有极高要求，非价格变量可在短期内弥补。" },
+      { icon:"🔋", tag:"大电池已是细分强制要求", text:"E-CAR 前 5 名全部 ≥80 kWh，600 km+ 续航是基线。电量偏小的 Mazda 6e（68.8 kWh/479 km）即使定价便宜也只能排在第 5，证明在 E 级，大电池不是加分项而是门槛。" },
+    ]
+  },
+  "A-SUV": {
+    headline:"极低价入场：€17–38k 的微型纯电 SUV 两强争霸",
+    factors:[
+      { icon:"💰", tag:"Dacia+Hyundai 双强垄断", text:"Dacia Spring (€16.9k) 与 Hyundai Casper EV (€23k) 合计占 A-SUV 市场 88%，以极低价格强势收割城市入门用户和东欧新兴市场（罗马尼亚、波兰等）。" },
+      { icon:"🚗", tag:"SUV 体型赋予感知价值", text:"与 A-CAR 相比，A-SUV 高车身+SUV 外观在消费者心中赋予更高'价值感'，即使底盘相近，也能溢价销售，解释了 Casper 比同尺寸掀背车贵 €3–5k 仍热销的原因。" },
+      { icon:"🏛️", tag:"欧洲补贴对小型车最友好", text:"法国 Bonus Écologique 对 €25k 以下车型最高 €7,000，Dacia Spring 有效落地价可低至 €9,900。德国 2025 年 Umweltbonus 重启也优先支持 €35k 以下车型。" },
+      { icon:"⚡", tag:"续航局限是核心短板", text:"Spring 仅 26.8 kWh/225 km，Nano Box 更低至 16 kWh/201 km，严重限制出城使用。Casper EV (49 kWh/278 km) 提供更优平衡，是其稳居第二的关键原因。" },
+    ]
+  },
+  "B-SUV": {
+    headline:"R5 现象级爆款：价格×设计×政策补贴三重共振",
+    factors:[
+      { icon:"🌟", tag:"R5 现象级解构", text:"R5 E-Tech 以 82,835 辆碾压 B-SUV，核心公式：€25k + 复古设计 + 法国本土生产（享法国 €4,000 生态奖金）+ NCAP 五星 + 49.1 kWh 够用续航。单车贡献全细分 27% 销量。" },
+      { icon:"🌍", tag:"ë-C3 的价格平权实验", text:"ë-C3 (€23,300) 是 B-SUV 价格最低的主流车，Stellantis 明确以'让纯电与燃油价格持平'为目标，ë-C3 是欧洲价格战最早期样本之一。" },
+      { icon:"🇨🇳", tag:"BYD Seagull 冲击价格底线", text:"Seagull (€20k/405 km) 以 B-SUV 最低价格提供最长续航，证明中国电池成本优势支撑欧洲渠道差价后仍具竞争力。欧盟关税政策是其主要不确定性。" },
+      { icon:"🎨", tag:"Volvo EX30 的设计溢价", text:"EX30 (€36k/457 km) 以北欧极简设计+SEA 吉利底盘+Volvo 安全光环在 B-SUV 卖出 C-SUV 的价格，吸引设计敏感年轻中产，证明品牌溢价空间在价格战中依然存在。" },
+    ]
+  },
+  "C-SUV": {
+    headline:"ELROQ 王者登基：MEB 平台规模效应的极致体现",
+    factors:[
+      { icon:"🏆", tag:"VW 集团 MEB 平台一统 C-SUV", text:"ELROQ (93,606) + ENYAQ (78,824) + ID.4 (71,405) + Q4 e-tron (62,337)，VW 集团四车合计 307,172 辆，占 Top10 总量 55%。MEB 平台零件共用率 >80%，规模效应极强。" },
+      { icon:"💡", tag:"ELROQ 精准定价策略", text:"ELROQ (€33k) 比 ID.4 (€40k) 便宜 €7,000，但提供同级 75.5 kWh + 392 km + Skoda 实用性。精准击中'要 VW 质量、不要 VW 溢价'的理性买家。" },
+      { icon:"🏎️", tag:"性能多元化竞争加剧", text:"Ford Explorer (€42k/566 km/82 kWh) 以大电量+长续航切入高端，CUPRA Tavascan (€46k) 以运动 SUV 定位分层，C-SUV 内部出现明显'用途分化'。" },
+      { icon:"🔌", tag:"800V 平台压力正在形成", text:"Q4 e-tron 仍为 400V 架构，但 Q6 e-tron（E-SUV）已升 800V，预计 2026 年 Q4 换代将带来显著快充体验提升，维持 Audi 在 C 级高端的占位优势。" },
+    ]
+  },
+  "D-SUV": {
+    headline:"Model Y 神话：领先优势仍是其他所有品牌的 3 倍",
+    factors:[
+      { icon:"⚡", tag:"超充网络+生态闭环护城河", text:"Model Y 以 154,394 辆领跑全部级别与类型，超充网络几乎无等待+全球统一 OTA+最高残值+柏林工厂交付周期仅 2–4 周。任何单一维度都很难被竞争对手在短期内复制。" },
+      { icon:"🌍", tag:"Renault Scenic 的本土优势", text:"Scenic EV (€40k/530 km) 位居第 2 (37,766 辆)，法国生产享法国/比利时/荷兰高额补贴，Renault 欧洲 3,500+ 经销商网络大规模铺货，是唯一可能在法国挑战 Model Y 的 D-SUV。" },
+      { icon:"🇰🇷", tag:"韩系 800V 快充是最强差异化", text:"IONIQ 5 (24,408) + EV6 (17,611) 合计约 42,000 辆，800V 超快充（18 分钟补 80%）+独特设计+E-GMP 平台成熟度是核心，但 €43–46k 价格在 Model Y 价格战下压力倍增。" },
+      { icon:"🇨🇳", tag:"中国品牌攻坚高端 D-SUV", text:"Xiaopeng G6 (€40k/562 km) 以智能驾驶为卖点切入，是中国品牌在 D-SUV 取得突破的稀有案例（14,605 辆）；LeapMotor C10 (€36k) 以低价切入长尾市场（6,114 辆）。" },
+    ]
+  },
+  "E-SUV": {
+    headline:"Audi Q6 主导超豪华纯电：100 kWh 已成入场门槛",
+    factors:[
+      { icon:"🏆", tag:"PPE 平台的技术统治力", text:"Q6 e-tron 以 56,431 辆领跑 E-SUV，800V / 270kW 超快充 + 100 kWh + 600 km + Audi 豪华定位三重加持。PPE 平台（保时捷/奥迪联合开发）充放电效率居行业最高梯队。" },
+      { icon:"💰", tag:"BYD Sea Lion 07 颠覆价格体系", text:"Sea Lion 07 (€50k/604 km) 以 Audi Q6 约 67% 的价格提供相当续航，位居第 4 (22,324 辆)，是中国品牌在欧洲豪华 SUV 最成功的突破之一，且上市不足一年即达此量级。" },
+      { icon:"🔋", tag:"100 kWh 成细分强制门槛", text:"E-SUV 前 5 名全部 ≥79.8 kWh（前 3 名均为 100 kWh），Lexus RZ (71.4 kWh) 以最小电池排第 7 且销量差距显著。大电池不是'加分项'，是 E-SUV 买家的强制要求。" },
+      { icon:"🌐", tag:"中国超豪华品牌欧洲试验", text:"ZEEKR 7X (€55k/91.7 kWh) + Xiaopeng G9 (€58k/88.5 kWh) 合计约 8,980 辆，证明在品牌力弱势下，大电量+低价格组合可支撑初步市场准入，但距离主流仍有较大差距。" },
+    ]
+  },
+};
+
+// =============================================================================
+// R&D — corrected per latest public sources (Autovista24 / Electrive / Visual Capitalist / CarVira)
+// =============================================================================
+window.RD_DATA = {
+  projects: [
+    // ----- A 级 (City) -----
+    { code:"PRJ-A01", oem:"Renault",   model:"Twingo E-Tech",     segment:"A", pack:"AmpR Small (RGEV)", kwh:27.5, kwhAlt:null, range:263, sop:"2026Q2", soc:"400V", chem:"LFP",     status:"Pre-prod",   note:"60kW/82PS · 6.6kW AC + 50kW DC可选 · CATL供应 · €19,500 · 仅1,200kg" },
+    { code:"PRJ-A02", oem:"Hyundai",   model:"Inster (Casper EV)",segment:"A", pack:"E-GMP Small",       kwh:42,   kwhAlt:49,  range:300, sop:"已上市 2025", soc:"400V", chem:"NMC",     status:"Launched",   note:"欧洲市场名为 Inster (非 Ioniq 1) · 42/49 kWh · 300-370km" },
+    { code:"PRJ-A03", oem:"Dacia",     model:"Spring 2.0",        segment:"A", pack:"AmpR Small",        kwh:25,   kwhAlt:null, range:220, sop:"2026Q3", soc:"400V", chem:"LFP",     status:"Engineering",note:"⚠ 待确认 · 现款 26.8kWh/225km · 2.0 预计小幅升级" },
+    { code:"PRJ-A04", oem:"VW",        model:"ID.1 City",         segment:"A", pack:"MEB Entry",         kwh:30,   kwhAlt:null, range:250, sop:"2027Q4", soc:"400V", chem:"LFP",     status:"Concept",    note:"⚠ 待确认 · 仅传闻 · 2027 推出 · 行业预估" },
+    { code:"PRJ-A05", oem:"Fiat",      model:"500e Mk2",          segment:"A", pack:"STLA Small",        kwh:42,   kwhAlt:54,  range:320, sop:"2027Q1", soc:"400V", chem:"LFP",     status:"Concept",    note:"Mirafiori 升级换代 · STLA Small 平台" },
+    { code:"PRJ-A06", oem:"Toyota",    model:"Aygo X EV",         segment:"A", pack:"e-TNGA Mini",       kwh:35,   kwhAlt:null, range:280, sop:"2027Q2", soc:"400V", chem:"LFP",     status:"Concept",    note:"Stellantis 合作平台共享 · 城市车型补完" },
+
+    // ----- B 级 (Compact) -----
+    { code:"PRJ-A07", oem:"VW",        model:"ID.Polo (原ID.2)",  segment:"B", pack:"MEB+",              kwh:37,   kwhAlt:52,  range:329, sop:"2026Q4", soc:"400V", chem:"LFP/NMC", status:"Validation", note:"✅修正 · MEB+/400V · 37kWh LFP + 52kWh NMC · 329/455km · DC 90kW(LFP)/130kW(NMC) · CATL+PowerCo · €25k起" },
+    { code:"PRJ-A08", oem:"Skoda",     model:"Epiq",              segment:"B", pack:"MEB+",              kwh:38.5, kwhAlt:55,  range:315, sop:"2026Q3", soc:"400V", chem:"LFP/NMC", status:"Tooling",    note:"✅修正 · Epiq 35/40 LFP 38.5 · Epiq 55 NMC · 315/430km · DC 50/90/133kW · 4.17m轴距2.60m · €25-26k" },
+    { code:"PRJ-A09", oem:"Cupra",     model:"Raval",             segment:"B", pack:"MEB+",              kwh:37,   kwhAlt:52,  range:300, sop:"2026Q2", soc:"400V", chem:"LFP/NMC", status:"Pre-prod",   note:"✅修正 · 2026/04 已发布 · 夏季交付 · 37/52kWh · 300/444km · 4 动力版 85-166kW · €25,950" },
+    { code:"PRJ-A10", oem:"Audi",      model:"A2 e-tron",         segment:"B", pack:"MEB+",              kwh:58,   kwhAlt:79,  range:426, sop:"2026 Fall", soc:"400V", chem:"LFP",   status:"Engineering",note:"✅修正 · MEB+/400V · CTP-LFP · 58/79kWh · 426/600km · €35k起" },
+    { code:"PRJ-A11", oem:"Renault",   model:"4 E-Tech",          segment:"B", pack:"AmpR Small",        kwh:40,   kwhAlt:52,  range:300, sop:"已上市 2025", soc:"400V", chem:"NMC",     status:"Launched",   note:"✅修正 · 双电池 40/52kWh · 300/400km · 复古设计延续 R5 DNA" },
+    { code:"PRJ-A12", oem:"Stellantis",model:"e-C3 Aircross",     segment:"B", pack:"STLA Small",        kwh:44,   kwhAlt:null, range:310, sop:"已上市 2025", soc:"400V", chem:"LFP",     status:"Launched",   note:"✅核实 · LFP · 300-320km" },
+    { code:"PRJ-A13", oem:"BYD",       model:"Atto 2",            segment:"B", pack:"e-Platform 3.0",    kwh:45.1, kwhAlt:64.8,range:312, sop:"已上市 2025/02", soc:"400V", chem:"LFP", status:"Launched",   note:"✅重大修正 · 300.8V (非800V) · 2025/02 已上市 · 45.1/51.1/64.8 kWh · 312-430km · DC 65-155kW" },
+    { code:"PRJ-A14", oem:"Kia",       model:"EV2",               segment:"B", pack:"E-GMP Small",       kwh:42,   kwhAlt:61,  range:320, sop:"2026Q3", soc:"400V", chem:"LFP/NMC", status:"Validation", note:"✅修正 · 双电池策略类比 EV3 · 42/61 kWh · 320-450km · Q3-Q4 发布" },
+    { code:"PRJ-A15", oem:"Toyota",    model:"Urban Cruiser EV",  segment:"B", pack:"Suzuki/Toyota共享", kwh:49,   kwhAlt:61,  range:350, sop:"已上市 2025", soc:"400V", chem:"LFP",     status:"Launched",   note:"⚠ 与铃木合作平台 · 49/61 kWh" },
+    { code:"PRJ-A16", oem:"Leapmotor", model:"A05 (待确认代号)",  segment:"B", pack:"LEAP3.5",           kwh:43,   kwhAlt:null, range:330, sop:"2026Q3", soc:"400V", chem:"LFP",     status:"Engineering",note:"⚠ 公开信息少 · 可能为内部代号 · Stellantis 渠道 · 当前在售 T03/C10" },
+    { code:"PRJ-A17", oem:"MG",        model:"MG2",               segment:"B", pack:"上汽 MSP-Mini",     kwh:38,   kwhAlt:51,  range:320, sop:"2026Q4", soc:"400V", chem:"LFP",     status:"Engineering",note:"对标 R5 / e-C3 · 上汽欧洲攻势" },
+
+    // ----- C 级 (Mid-size) -----
+    { code:"PRJ-A18", oem:"VW",        model:"ID.3 GTX / Mk2",    segment:"C", pack:"MEB+",              kwh:58,   kwhAlt:77,  range:450, sop:"2026Q1", soc:"400V", chem:"NMC",     status:"Pre-prod",   note:"中期改款 · 800V 选装 · 软件 4.0" },
+    { code:"PRJ-A19", oem:"Renault",   model:"Scenic E-Tech Mk2", segment:"C", pack:"CMF-EV",            kwh:60,   kwhAlt:87,  range:430, sop:"2027Q1", soc:"400V", chem:"NMC",     status:"Engineering",note:"7 座家庭车换代 · CMF-EV 升级" },
+    { code:"PRJ-A20", oem:"Skoda",     model:"Enyaq Mk2",         segment:"C", pack:"MEB+",              kwh:77,   kwhAlt:84,  range:480, sop:"2027Q2", soc:"800V", chem:"NMC",     status:"Concept",    note:"新一代 MEB+ 800V · 200kW DC" },
+    { code:"PRJ-A21", oem:"Hyundai",   model:"Ioniq 3",           segment:"C", pack:"E-GMP",             kwh:60,   kwhAlt:81,  range:430, sop:"2026Q4", soc:"800V", chem:"NMC",     status:"Validation", note:"对标 ID.3 · 800V 18min 快充" },
+
+    // ----- D 级 (Premium) -----
+    { code:"PRJ-A22", oem:"BMW",       model:"iX3 Neue Klasse",   segment:"D", pack:"Gen6 BMW",          kwh:75,   kwhAlt:108, range:600, sop:"2026Q1", soc:"800V", chem:"NMC",     status:"Pre-prod",   note:"Neue Klasse 平台首发 · 圆柱电芯 · 30% 能量密度↑" },
+    { code:"PRJ-A23", oem:"Mercedes",  model:"CLA EV",            segment:"D", pack:"MMA",               kwh:58,   kwhAlt:85,  range:750, sop:"已上市 2025", soc:"800V", chem:"NMC", status:"Launched",   note:"WLTP 750km · 800V 320kW · MMA 平台首款" },
+    { code:"PRJ-A24", oem:"Audi",      model:"Q6 L e-tron",       segment:"D", pack:"PPE",               kwh:94,   kwhAlt:107, range:625, sop:"2026Q2", soc:"800V", chem:"NMC",     status:"Pre-prod",   note:"长轴距版 · PPE 平台 · 270kW DC" },
+  ],
+
+  packCommonality: [
+    { pack:"Std-Pack S1 (38kWh / 400V / LFP)",  models:["VW ID.Polo LFP","Skoda Epiq 35","Cupra Raval LFP","Renault Twingo","Dacia Spring 2.0","MG2"],     synergy:88, save:"€420/车" },
+    { pack:"Std-Pack S2 (52kWh / 400V / LFP/NMC)", models:["VW ID.Polo NMC","Skoda Epiq 55","Cupra Raval NMC","Renault 4","Toyota Urban Cruiser","Kia EV2","BYD Atto 2"], synergy:74, save:"€380/车" },
+    { pack:"Std-Pack M1 (60-80kWh / 800V / NMC)",  models:["VW ID.3 Mk2","Hyundai Ioniq 3","Skoda Enyaq Mk2","BMW iX3 Neue Klasse"], synergy:62, save:"€510/车" },
+    { pack:"Std-Pack M2 (44-58kWh / 400V / LFP)",  models:["e-C3 Aircross","Audi A2 e-tron 58","Fiat 500e Mk2","Toyota Aygo X EV"], synergy:58, save:"€340/车" },
+  ],
+};
+
+// =============================================================================
+// PAIN — full segments + Europe-popular EV voices
+// =============================================================================
+window.PAIN_DATA = {
+  segments: [
+    { seg:"A00 / A0 City", count:412, top:[
+      {pt:"续航虚标 / 冬季掉电严重",   weight:34, sentiment:-0.78, voices:188},
+      {pt:"快充功率不足 (<50kW)",       weight:28, sentiment:-0.65, voices:142},
+      {pt:"后排空间局促",                weight:18, sentiment:-0.42, voices:91},
+      {pt:"内饰用料廉价感",              weight:12, sentiment:-0.35, voices:67},
+      {pt:"软件OTA慢 / 卡顿",            weight:8,  sentiment:-0.28, voices:44},
+    ], opp:["热泵标配化","50kW+ 直流快充","NVH 升级","数字仪表标配"] },
+    { seg:"B Compact",     count:687, top:[
+      {pt:"高速续航折损 (>30%)",        weight:31, sentiment:-0.71, voices:212},
+      {pt:"热泵缺失 / 冬季能耗",         weight:24, sentiment:-0.58, voices:165},
+      {pt:"后备箱容积小",                weight:17, sentiment:-0.40, voices:117},
+      {pt:"后排腿部空间",                weight:15, sentiment:-0.45, voices:103},
+      {pt:"娱乐系统响应慢",              weight:13, sentiment:-0.32, voices:90},
+    ], opp:["LFP CTP 提升能量密度","800V 平台下放","软件流畅性","双电池策略"] },
+    { seg:"C Mid-size",    count:534, top:[
+      {pt:"800V快充覆盖率不足",          weight:29, sentiment:-0.62, voices:155},
+      {pt:"NVH噪音 / 风噪",              weight:22, sentiment:-0.48, voices:118},
+      {pt:"ADAS辅助驾驶不稳定",          weight:20, sentiment:-0.55, voices:107},
+      {pt:"维修保养成本高",              weight:16, sentiment:-0.51, voices:85},
+      {pt:"车机生态封闭",                weight:13, sentiment:-0.38, voices:69},
+    ], opp:["L2+ 高速 ADAS","Sound deadening","可对接 Android Auto/CarPlay","透明定保"] },
+    { seg:"D Premium",     count:318, top:[
+      {pt:"软件Bug / 死机重启",          weight:33, sentiment:-0.74, voices:105},
+      {pt:"实体按键过少",                weight:25, sentiment:-0.60, voices:80},
+      {pt:"残值率快速下跌",              weight:19, sentiment:-0.65, voices:60},
+      {pt:"换电/快充网络缺失",           weight:13, sentiment:-0.45, voices:42},
+      {pt:"夏季空调耗电",                weight:10, sentiment:-0.32, voices:31},
+    ], opp:["软件稳定性","实体按键回归","保值率承诺","欧洲超充网络"] },
+  ],
+
+  // Europe high-volume EV models only — voices from EU forums
+  models: [
+    { model:"Tesla Model Y", brand:"Tesla", units:150605,
+      pros:["超充网络无可替代","OTA迭代快","残值最稳"],
+      cons:["内饰塑料感","实体按键全消失","风噪偏大","底盘偏硬"],
+      quote:"\"Phantom braking on highways at 130 km/h is still happening — three years in.\"",
+      source:"r/TeslaModelY · 4.2k upvotes" },
+    { model:"VW ID.4 / ID.5", brand:"VW", units:88420,
+      pros:["底盘德系扎实","空间大","充电曲线稳"],
+      cons:["车机卡顿是常态","触摸方向盘按钮反人类","充电门冬季冻住"],
+      quote:"\"Infotainment freezes once a week. I have to stop and reboot the car.\"",
+      source:"VWIDtalk.com · Top thread" },
+    { model:"Renault R5 E-Tech", brand:"Renault", units:84300,
+      pros:["设计独一档","B级最有趣的电车","€25k 起售对得起品质"],
+      cons:["快充功率仅 100kW","后排上车不便","高速续航打折"],
+      quote:"\"Charging from 10–80% takes 30+ min on a 150kW stall — slower than spec'd.\"",
+      source:"Speak EV forum" },
+    { model:"Skoda Elroq", brand:"Skoda", units:78140,
+      pros:["性价比最高的MEB车型","隔音优秀","实用主义内饰"],
+      cons:["前排座椅偏短","软件与ID系列同病","选装包昂贵"],
+      quote:"\"The MEB software issues are inherited — same bugs as my old ID.3.\"",
+      source:"BriskOda forum" },
+    { model:"Kia EV3", brand:"Kia", units:72400,
+      pros:["18min 快充","底盘调教成熟","质保7年安心"],
+      cons:["单电机起步偏弱","内饰塑料件","低配缺热泵"],
+      quote:"\"Heat pump should be standard at this price — 30% range loss in winter without it.\"",
+      source:"SpeakEV · Kia EV3 thread" },
+    { model:"Audi Q4 e-tron", brand:"Audi", units:62550,
+      pros:["豪华质感","保值率优于VW同平台","NVH优秀"],
+      cons:["MEB软件痼疾","内饰按键学习曲线","快充峰值仅135kW"],
+      quote:"\"For the price difference vs ID.4, you get badge and quieter cabin — not much else.\"",
+      source:"AudiWorld" },
+    { model:"Volvo EX30", brand:"Volvo", units:54800,
+      pros:["北欧极简内饰","Alcantara/再生材料","SEA 浩瀚架构操控"],
+      cons:["所有控制集中在中控屏","后排略局促","中国生产引部分担忧"],
+      quote:"\"Even the speedometer is on the centre screen — I want to look forward, not sideways.\"",
+      source:"SpeakEV · EX30 thread" },
+    { model:"Peugeot e-208", brand:"Peugeot", units:56200,
+      pros:["i-Cockpit 设计感","操控灵活","€28k 城市代步首选"],
+      cons:["真实续航低于宣称","充电曲线平庸","后排狭窄"],
+      quote:"\"Advertised 410km WLTP, real-world is closer to 270km on motorway.\"",
+      source:"Speak EV · Peugeot thread" },
+    { model:"MG4 EV", brand:"MG", units:51600,
+      pros:["MSP 后驱平台底盘","€27k 极致性价比","7 年质保"],
+      cons:["软件不如欧洲对手成熟","品牌豪华感不足","二手价格波动"],
+      quote:"\"Drives better than cars twice the price — but the infotainment is from 2018.\"",
+      source:"r/electriccars" },
+  ],
+};
+
+window.COMPETE_DATA = {
+  launches: [
+    // ── A 段 (A00) · 城市微型车 ─────────────────────────────────
+    { model:"Renault Twingo E-Tech",oem:"Renault",  seg:"A", price:19490, kwh:27.5, range:263, sop:"2026Q2", flag:"🇫🇷", motor:82,  dc:50,  chem:"LFP",  platform:"AmpR Small",  madeIn:"🇸🇮 Slovenia",  subsidy:"FR CEE ≤€5.7k", weight:1200 },
+    { model:"Dacia Spring",         oem:"Renault",  seg:"A", price:16900, kwh:26.8, range:228, sop:"在售",    flag:"🇷🇴", motor:65,  dc:30,  chem:"LFP",  platform:"CMF-A",       madeIn:"🇨🇳 China",    subsidy:"不符合FR CEE", weight:984  },
+    { model:"Leapmotor T03",        oem:"Stellantis",seg:"A",price:18900, kwh:37.3, range:265, sop:"在售",    flag:"🇨🇳", motor:95,  dc:70,  chem:"LFP",  platform:"LEAP",        madeIn:"🇵🇱 Poland(CKD)",subsidy:"符合EU本地", weight:1200 },
+    { model:"Fiat 500e (现款)",     oem:"Stellantis",seg:"A",price:23700, kwh:42,   range:320, sop:"在售",    flag:"🇮🇹", motor:118, dc:85,  chem:"NMC",  platform:"STLA Small",  madeIn:"🇮🇹 Italy",    subsidy:"IT ≤€11k", weight:1365 },
+    { model:"VW ID.EVERY1",         oem:"VW",       seg:"A", price:17000, kwh:30,   range:250, sop:"2027Q4", flag:"🇩🇪", motor:94,  dc:50,  chem:"LFP",  platform:"MEB Entry简化",madeIn:"🇪🇺 EU(TBD)", subsidy:"DE ≤€3.6k(est)", weight:1150 },
+    // ── B 段 (A0) · 紧凑型掀背/SUV ─────────────────────────────
+    { model:"Renault 5 E-Tech",     oem:"Renault",  seg:"B", price:24990, kwh:52,   range:410, sop:"在售",    flag:"🇫🇷", motor:150, dc:100, chem:"NMC",  platform:"AmpR Small",  madeIn:"🇫🇷 France",   subsidy:"FR CEE ≤€5.7k", weight:1449 },
+    { model:"Citroën ë-C3",         oem:"Stellantis",seg:"B",price:23300, kwh:44,   range:320, sop:"在售",    flag:"🇫🇷", motor:112, dc:100, chem:"LFP",  platform:"Smart Car",   madeIn:"🇸🇰 Slovakia", subsidy:"FR CEE ≤€5.7k", weight:1416 },
+    { model:"BYD Dolphin Surf",     oem:"BYD",      seg:"B", price:22990, kwh:43.2, range:310, sop:"2025Q2", flag:"🇨🇳", motor:156, dc:65,  chem:"LFP",  platform:"e-Platform 3.0",madeIn:"🇨🇳 China",  subsidy:"不符合FR CEE", weight:1350 },
+    { model:"Hyundai INSTER",       oem:"Hyundai",  seg:"A→B",price:25000,kwh:49,   range:355, sop:"在售",    flag:"🇰🇷", motor:114, dc:85,  chem:"NMC",  platform:"改良Casper",  madeIn:"🇰🇷 Korea",   subsidy:"DE ≤€3.6k(est)", weight:1260 },
+    { model:"Kia EV2",              oem:"Kia",      seg:"B", price:30000, kwh:61,   range:448, sop:"2026Q1", flag:"🇰🇷", motor:136, dc:120, chem:"NMC",  platform:"E-GMP 400V",  madeIn:"🇸🇰 Slovakia", subsidy:"符合EU本地", weight:1480 },
+    { model:"Cupra Raval",          oem:"VW Group", seg:"B", price:25950, kwh:52,   range:444, sop:"2026Q2", flag:"🇪🇸", motor:226, dc:125, chem:"NMC",  platform:"MEB+",        madeIn:"🇪🇸 Spain",    subsidy:"ES ≤€7k", weight:1470 },
+    { model:"VW ID.Polo",           oem:"VW",       seg:"B", price:25000, kwh:52,   range:455, sop:"2026Q4", flag:"🇩🇪", motor:130, dc:130, chem:"NMC",  platform:"MEB+",        madeIn:"🇪🇸 Spain",    subsidy:"DE ≤€3.6k", weight:1450 },
+    { model:"Skoda Epiq",           oem:"VW Group", seg:"B", price:25000, kwh:38.5, range:315, sop:"2026H2", flag:"🇨🇿", motor:99,  dc:90,  chem:"LFP",  platform:"MEB+",        madeIn:"🇪🇸 Spain",    subsidy:"符合EU本地", weight:1420 },
+  ],
+
+  battery: [
+    { name:"CATL",          country:"CN", share:42.1, gwh:56.9, yoy:13.7,  trend:[37.7,38.1,38.2,39.2,45.2,42.1] },
+    { name:"BYD",           country:"CN", share:13.4, gwh:18.1, yoy:-2.4,  trend:[16.9,16.7,16.4,16.4,13.8,13.4] },
+    { name:"LG Energy Sol", country:"KR", share:8.7,  gwh:11.8, yoy:-2.7,  trend:[10.9,9.6,9.3,9.0,8.5,8.7] },
+    { name:"CALB",          country:"CN", share:5.3,  gwh:7.1,  yoy:8.0,   trend:[5.1,5.2,5.3,5.3,5.3,5.3] },
+    { name:"Gotion",        country:"CN", share:3.9,  gwh:5.3,  yoy:14.0,  trend:[3.2,3.5,3.6,4.5,3.9,3.9] },
+    { name:"SK On",         country:"KR", share:3.8,  gwh:5.2,  yoy:-12.9, trend:[5.5,4.8,4.2,3.7,3.6,3.8] },
+    { name:"Panasonic",     country:"JP", share:4.3,  gwh:5.8,  yoy:-5.0,  trend:[6.4,5.2,4.8,3.7,4.3,4.3] },
+    { name:"Samsung SDI",   country:"KR", share:2.5,  gwh:3.3,  yoy:-21.9, trend:[4.2,3.8,3.0,2.4,2.6,2.5] },
+    { name:"Eve Energy",    country:"CN", share:2.4,  gwh:3.2,  yoy:18.0,  trend:[1.8,2.0,2.2,2.6,2.4,2.4] },
+  ],
+
+  moves: [
+    { co:"BYD",   date:"2026-03", title:"1,500kW超充桩 + 万站计划", body:"BYD发布全球最大功率充电桩，宣布2万站布局，绑定汉L/唐L等闪充车型。" },
+    { co:"BYD",   date:"2026-02", title:"30 GWh 钠离子产能投资",    body:"BYD加码钠电产线，目标2027前实现30GWh，对标CATL 2027商业化时间表。" },
+    { co:"LG ES", date:"2026-Q1", title:"摩洛哥LFP工厂投产",         body:"首次大规模进入磷酸铁锂赛道，欧洲本地化对冲中国出口关税。" },
+    { co:"Samsung SDI", date:"2027(plan)", title:"S-Line 全固态量产", body:"Samsung SDI \"super-gap\" 全固态电池规划2027量产。" },
+    { co:"SK On", date:"2026 SOP", title:"LFP量产首线",              body:"配套Hyundai/Ford大众化车型。" },
+    { co:"Panasonic", date:"2025-07", title:"Kansas 32GWh 投产",     body:"年产能32 GWh，可供约50万辆EV。" },
+    { co:"Toyota", date:"2027-28", title:"全固态电池量产时点",        body:"10分钟充电 + 续航提升20-50%。" },
+    { co:"CATL",   date:"2026-04", title:"神行Pro + 钠电技术日",     body:"续航758km，10分钟补能478km(极寒)。" },
+  ],
+};
+
+console.log("[data] loaded", Object.keys(window.MARKET_DATA), Object.keys(window.RD_DATA), Object.keys(window.PAIN_DATA), Object.keys(window.COMPETE_DATA));
+
+// =============================================================================
+// A0/A00 SEGMENT DEEP DIVE — 欧洲小型电动车专题
+// =============================================================================
+window.A0_SEGMENT_DATA = {
+  // ── 在售车型详细参数 ──────────────────────────────────────────────
+  onSale: [
+    { model:"Renault 5 E-Tech",   seg:"B", oem:"Renault",   price:"€24,990", battery:"40/52 kWh", chem:"NMC (AESC pouch)", range:"312/410", motor:"90/110 kW", dc:"80/100 kW", ac:"11 kW", platform:"AmpR Small", made:"🇫🇷 Douai", v2g:true,  weight:1449, length:3922, sales2025:84300, award:"2025 欧洲年度车", note:"52kWh 版电池自产 (Ampere Douai 工厂) · 支持 V2G 双向充电" },
+    { model:"Citroën ë-C3",       seg:"B", oem:"Stellantis", price:"€23,300", battery:"30/44 kWh", chem:"LFP/NMC",         range:"209/320", motor:"83/112 kW", dc:"100 kW",    ac:"7/11 kW", platform:"Smart Car", made:"🇸🇰 Slovakia", v2g:false, weight:1416, length:4015, sales2025:52800, award:null, note:"2025/08 新增 54kWh Aircross Extended Range (400km)" },
+    { model:"BYD Dolphin Surf",    seg:"B", oem:"BYD",       price:"€19,990*",battery:"30/43.2 kWh",chem:"LFP (Blade)",    range:"220/310", motor:"87/156 kW", dc:"65 kW",     ac:"6.6 kW", platform:"e-Platform 3.0", made:"🇨🇳 China", v2g:false, weight:1350, length:3990, sales2025:null, award:null, note:"*促销价至2025/06 · 常规€22,990起 · 海鸥欧洲加长版 (+210mm) · 不符合法国CEE" },
+    { model:"Hyundai INSTER",      seg:"A→B",oem:"Hyundai",  price:"€25,000", battery:"42/49 kWh", chem:"NMC",              range:"300/355", motor:"71/85 kW",  dc:"73/85 kW",  ac:"11 kW", platform:"改良Casper", made:"🇰🇷 Korea", v2g:false, weight:1260, length:3825, sales2025:34600, award:"4★ Euro NCAP", note:"后排可滑动/折叠 · V2L外放电 · 仅4座" },
+    { model:"Dacia Spring",        seg:"A", oem:"Dacia",     price:"€16,900", battery:"26.8 kWh",  chem:"LFP",              range:"228",     motor:"48 kW",     dc:"30 kW",     ac:"7 kW",  platform:"CMF-A",     made:"🇨🇳 China", v2g:false, weight:984,  length:3701, sales2025:28400, award:null, note:"欧洲最便宜新能源车 · 中国制造不符合法国CEE" },
+    { model:"Leapmotor T03",       seg:"A", oem:"Stellantis/零跑",price:"€18,900",battery:"37.3 kWh(净)",chem:"LFP",       range:"265",     motor:"70 kW",     dc:"70 kW",     ac:"6.6 kW",platform:"LEAP",      made:"🇵🇱 Poland(CKD)", v2g:false, weight:1200, length:3620, sales2025:null, award:null, note:"中国散件 → 波兰组装 · 符合欧洲本地化补贴 · 单一配置全配" },
+    { model:"Fiat 500e",           seg:"A", oem:"Stellantis", price:"€23,700", battery:"24/42 kWh", chem:"NMC",             range:"190/320", motor:"70/87 kW",  dc:"50/85 kW",  ac:"11 kW", platform:"STLA Small", made:"🇮🇹 Mirafiori", v2g:false, weight:1365, length:3631, sales2025:39400, award:null, note:"经典复古设计 · 意大利本土生产 · 高端城市定位" },
+    { model:"Fiat Grande Panda",   seg:"B", oem:"Stellantis", price:"€25,000", battery:"44 kWh",    chem:"LFP",             range:"320",     motor:"83 kW",     dc:"100 kW",    ac:"7 kW",  platform:"Smart Car", made:"🇮🇹 Melfi", v2g:false, weight:1390, length:3990, sales2025:null, award:null, note:"与ë-C3共平台 · 意大利市场优先" },
+  ],
+
+  // ── 即将上市 / 在研车型 ──────────────────────────────────────────
+  upcoming: [
+    { model:"Renault Twingo E-Tech",seg:"A", oem:"Renault", price:"€19,490",  battery:"27.5 kWh", chem:"LFP (雷诺首款)", range:"263 km",  motor:"60 kW / 82 hp", dc:"50 kW(选装)",  sop:"2026Q2", platform:"AmpR Small", made:"🇸🇮 Slovenia (Novo Mesto)", status:"Pre-prod · 已开放预订", subsidy:"FR CEE ≤€4,200 · 补贴后低至€14,720", highlight:"回归圆润经典设计 · LFP可100%充至满 · 360L后备箱(后排前推)" },
+    { model:"Cupra Raval",          seg:"B", oem:"VW Group", price:"€25,950", battery:"38/56 kWh", chem:"LFP/NMC",        range:"300/444",  motor:"85-226 hp",     dc:"125 kW",       sop:"2026夏", platform:"MEB+",      made:"🇪🇸 Martorell", status:"Pre-prod · IAA 2025亮相 · 4月已发布", subsidy:"ES Auto+ ≤€7k · 430L后备箱", highlight:"VZ版226hp/6.9s · eLSD电子差速 · V2L外放电" },
+    { model:"VW ID.Polo",           seg:"B", oem:"VW",       price:"~€25,000",battery:"38/56 kWh", chem:"LFP/NMC",        range:"329/455",  motor:"85-130 kW",     dc:"90/130 kW",    sop:"2026Q4", platform:"MEB+",      made:"🇪🇸 Martorell", status:"Validation", subsidy:"DE 新补贴 ≤€3.6k", highlight:"Polo精神续作 · 与Raval共线生产 · Plug & Charge" },
+    { model:"Skoda Epiq",           seg:"B", oem:"VW Group", price:"~€25,000",battery:"38.5/55 kWh",chem:"LFP/NMC",       range:"315/430",  motor:"85-99 kW",      dc:"50/90/133 kW", sop:"2026H2", platform:"MEB+",      made:"🇪🇸 Pamplona", status:"Tooling · IAA 2025 展示", subsidy:"475L超大后备箱 · Modern Solid设计语言", highlight:"Epiq 35/40 LFP入门 · Epiq 55 NMC长续航" },
+    { model:"Kia EV2",              seg:"B", oem:"Kia",      price:"~€30,000",battery:"42.2/61 kWh",chem:"LFP/NMC",       range:"317/448",  motor:"~136 kW",       dc:"~120 kW",      sop:"2026Q1(已量产)",platform:"E-GMP 400V",made:"🇸🇰 Žilina", status:"Launched · 2026/03量产", subsidy:"22kW AC标配(同级罕见) · V2G · V2L", highlight:"欧洲专属车型 · 后排独立滑动座椅 · 2026目标10万辆" },
+    { model:"VW ID.EVERY1",         seg:"A", oem:"VW",       price:"~€17,000",battery:"~30 kWh",   chem:"LFP",            range:"≥250 km",  motor:"70 kW / 94 hp", dc:"~50 kW(est)",  sop:"2027Q4", platform:"MEB Entry简化",made:"🇪🇺 EU(TBD)", status:"Concept · 2025/03发布", subsidy:"VW-Rivian联合软件架构 · 全生命OTA", highlight:"Up!精神续作 · A段入门EV · €17k 震撼定价" },
+  ],
+
+  // ── 欧洲主要国家补贴政策 (2025-2026) ────────────────────────────
+  subsidies: [
+    { country:"🇫🇷 法国",  year:"2025-26", purchase:"CEE Prime: 低收入≤€5,700 / 中收入≤€3,100", leasing:"社会租赁: €100-150/月 · 无首付 · 2025/09重启", tax:"BEV免TVS公司税 · BIK减50%", condition:"碳足迹评分 — 欧洲制造优先 · 中国制造(Spring/Dolphin Surf)不符合", impact:"2026Q1 BEV份额27% · 同比+9pp" },
+    { country:"🇩🇪 德国",  year:"2026-29", purchase:"新补贴计划: 约€3,000-3,600 · 预算€30亿/80万辆", leasing:"无专项社会租赁", tax:"BEV 10年免车辆税(2025前注册) · 公司车0.25%", condition:"家庭应税收入≤€80,000 · 每孩+€5k(上限€90k)", impact:"2025年因补贴中断销量曾暴跌 · 2026重启后强劲反弹" },
+    { country:"🇮🇹 意大利",year:"2025-26", purchase:"Ecobonus: 最高€11,000(报废旧车+低收入) · 购价≤€35k", leasing:"无", tax:"BEV公司车应税10%(vs燃油车更高) · 5年免车辆税", condition:"城市功能区居民优先 · ISEE收入指标", impact:"2026H1 BEV份额7% · 同比+2pp" },
+    { country:"🇪🇸 西班牙",year:"2025-26", purchase:"Auto+: BEV≤€45k补贴≤€4,500 · 报废加€2,500 · 合计≤€7,000", leasing:"无", tax:"个税减免购车成本15%(上限€3k) · 主要城市路税-75%", condition:"适用于所有品牌", impact:"2026H1 BEV份额9% · 同比+2pp" },
+    { country:"🇪🇺 欧盟整体",year:"2026+", purchase:"拟推70%欧洲本地化制造才可获补贴(提案中)", leasing:"N/A", tax:"CO₂排放2025新标准 · 超级积分鼓励小型EV欧洲生产", condition:"2025/12 汽车一揽子计划 · NZIA弹性标准2026/01生效", impact:"倒逼中国车企在欧建厂 · BYD/CATL匈牙利工厂加速" },
+  ],
+
+  // ── 市场概览KPI ──────────────────────────────────────────────────
+  marketKPI: {
+    bevShare2025: 19.5,
+    bevShare2026Q1: 20,
+    bSegPriceDrop2025: -13,
+    bSegPriceDropAbs: 4600,
+    avgBevPrice2025: 42700,
+    sub25kShare: 6,
+    sub25kShare2024: 3,
+    pipelineCount: "10+",
+    bevYoY: 29.7,
+  },
+};
+
+console.log("[data] A0_SEGMENT_DATA loaded", Object.keys(window.A0_SEGMENT_DATA));
+
+
+</script>
+<!-- =============================================================
+  工具层 — Shared Atoms & Utilities (Cursor · smooth scroll · motion hooks · export helpers)
+============================================================= -->
+<script type="text/babel">
+// Shared atoms / utilities for the EV Intelligence platform
+const { useEffect, useState, useRef, useMemo, useCallback, useLayoutEffect } = React;
+const { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring, useInView } = window.Motion || {};
+
+// ---- Smooth scroll (Lenis-style damped) ---------------------------------
+function useSmoothScroll() {
+  useEffect(() => {
+    let target = window.scrollY;
+    let current = window.scrollY;
+    let raf;
+    let active = false;
+    const ease = 0.085;
+
+    const onWheel = (e) => {
+      // Let inputs / scrollable inner areas do their thing
+      const el = e.target.closest("[data-no-smooth], input, textarea, select");
+      if (el) {
+        // Re-sync target to native scrollY so resuming smooth scroll won't teleport
+        target = window.scrollY;
+        current = window.scrollY;
+        return;
+      }
+      e.preventDefault();
+      // If something else moved page scroll (drag, anchor click, etc), re-sync first
+      if (!active && Math.abs(window.scrollY - current) > 1) {
+        target = window.scrollY;
+        current = window.scrollY;
+      }
+      target += e.deltaY;
+      target = Math.max(0, Math.min(target, document.body.scrollHeight - window.innerHeight));
+      if (!active) loop();
+    };
+    const onScroll = () => {
+      // External scroll source (drag scrollbar, keyboard, programmatic) — re-sync when idle
+      if (!active) { target = window.scrollY; current = window.scrollY; }
+    };
+    const loop = () => {
+      active = true;
+      current += (target - current) * ease;
+      if (Math.abs(target - current) < 0.4) {
+        current = target;
+        window.scrollTo(0, current);
+        active = false;
+        return;
+      }
+      window.scrollTo(0, current);
+      raf = requestAnimationFrame(loop);
+    };
+    const onResize = () => { target = window.scrollY; current = window.scrollY; };
+    window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("resize", onResize);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+}
+
+// ---- Reveal on scroll ----------------------------------------------------
+function Reveal({ children, delay = 0, y = 24, className = "" }) {
+  const ref = useRef(null);
+  const [seen, setSeen] = useState(false);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { setSeen(true); io.disconnect(); } });
+    }, { rootMargin: "-10% 0px -5% 0px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <div
+      ref={ref}
+      className={className}
+      style={{
+        opacity: seen ? 1 : 0,
+        transform: seen ? "translateY(0)" : `translateY(${y}px)`,
+        transition: `opacity .9s ${delay}ms cubic-bezier(.2,.8,.2,1), transform .9s ${delay}ms cubic-bezier(.2,.8,.2,1)`,
+      }}
+    >{children}</div>
+  );
+}
+
+// ---- Animated number -----------------------------------------------------
+function Counter({ to, suffix = "", prefix = "", decimals = 0, duration = 1.6 }) {
+  const ref = useRef(null);
+  const [v, setV] = useState(0);
+  const [active, setActive] = useState(false);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { setActive(true); io.disconnect(); } });
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  useEffect(() => {
+    if (!active) return;
+    const start = performance.now();
+    let raf;
+    const tick = (now) => {
+      const t = Math.min(1, (now - start) / (duration * 1000));
+      const eased = 1 - Math.pow(1 - t, 4);
+      setV(to * eased);
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [active, to, duration]);
+  const formatted = decimals > 0
+    ? v.toFixed(decimals)
+    : Math.round(v).toLocaleString("en-US");
+  return <span ref={ref}>{prefix}{formatted}{suffix}</span>;
+}
+
+// ---- Custom cursor ring --------------------------------------------------
+function Cursor() {
+  const ringRef = useRef(null); const dotRef = useRef(null);
+  useEffect(() => {
+    let x = window.innerWidth/2, y = window.innerHeight/2;
+    let rx = x, ry = y;
+    let raf;
+    const onMove = (e) => { x = e.clientX; y = e.clientY; };
+    const onEnter = (e) => {
+      if (e.target.closest("button, a, .chip, .bubble, .nav-link, .tab, [data-cursor]")) {
+        ringRef.current.style.width = "44px"; ringRef.current.style.height = "44px";
+      }
+    };
+    const onLeave = () => { ringRef.current.style.width = "28px"; ringRef.current.style.height = "28px"; };
+    const loop = () => {
+      rx += (x - rx) * 0.18; ry += (y - ry) * 0.18;
+      if (ringRef.current) { ringRef.current.style.left = rx+"px"; ringRef.current.style.top = ry+"px"; }
+      if (dotRef.current) { dotRef.current.style.left = x+"px"; dotRef.current.style.top = y+"px"; }
+      raf = requestAnimationFrame(loop);
+    };
+    window.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseover", onEnter);
+    document.addEventListener("mouseout", onLeave);
+    raf = requestAnimationFrame(loop);
+    return () => { window.removeEventListener("mousemove", onMove); cancelAnimationFrame(raf); };
+  }, []);
+  if (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches) return null;
+  return (<>
+    <div ref={ringRef} className="cursor-ring" />
+    <div ref={dotRef} className="cursor-dot" />
+  </>);
+}
+
+// ---- Magnetic button -----------------------------------------------------
+function Magnet({ children, strength = 0.35, className = "", ...rest }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const onMove = (e) => {
+      const r = el.getBoundingClientRect();
+      const dx = e.clientX - (r.left + r.width/2);
+      const dy = e.clientY - (r.top + r.height/2);
+      el.style.transform = `translate(${dx*strength}px, ${dy*strength}px)`;
+    };
+    const onLeave = () => { el.style.transform = "translate(0,0)"; };
+    el.addEventListener("mousemove", onMove);
+    el.addEventListener("mouseleave", onLeave);
+    return () => { el.removeEventListener("mousemove", onMove); el.removeEventListener("mouseleave", onLeave); };
+  }, [strength]);
+  return <span ref={ref} className={`magnet ${className}`} {...rest}>{children}</span>;
+}
+
+// ---- Sparkline -----------------------------------------------------------
+function Sparkline({ values, w = 80, h = 28, color = "#14171c", fill = false }) {
+  const min = Math.min(...values), max = Math.max(...values);
+  const range = max - min || 1;
+  const pts = values.map((v, i) => {
+    const x = (i / (values.length - 1)) * w;
+    const y = h - ((v - min) / range) * (h - 4) - 2;
+    return [x, y];
+  });
+  const d = pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" ");
+  const area = d + ` L${w} ${h} L0 ${h} Z`;
+  return (
+    <svg width={w} height={h} className="spark">
+      {fill && <path d={area} fill={color} opacity="0.12" />}
+      <path d={d} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <circle cx={pts[pts.length-1][0]} cy={pts[pts.length-1][1]} r="2" fill={color} />
+    </svg>
+  );
+}
+
+// ---- Tooltip layer -------------------------------------------------------
+function useTooltip() {
+  const [tt, setTt] = useState(null);
+  const show = (content, e) => setTt({ content, x: e.clientX, y: e.clientY });
+  const move = (e) => setTt(prev => prev ? { ...prev, x: e.clientX, y: e.clientY } : null);
+  const hide = () => setTt(null);
+  const node = tt ? <div className="tt" style={{ left: tt.x, top: tt.y - 16 }}>{tt.content}</div> : null;
+  return { show, move, hide, node };
+}
+
+// ---- Format helpers ------------------------------------------------------
+const fmt = {
+  k: (n) => n >= 1000 ? (n/1000).toFixed(n >= 10000 ? 0 : 1)+"k" : String(n),
+  pct: (n, d=1) => (n>=0?"+":"") + n.toFixed(d) + "%",
+  comma: (n) => Math.round(n).toLocaleString("en-US"),
+  eur: (n) => "€"+(n>=1000 ? (n/1000).toFixed(0)+"k" : n),
+};
+
+// ---- Export Button (PNG capture of nearest .card) -----------------------
+//
+// 修复要点：
+//  1. scrollIntoView + double-rAF + 200ms 等待 — 确保目标元素完全布局后再截图
+//  2. scrollX/scrollY 校正 — 消除页面滚动导致截图偏移的 bug
+//  3. onclone 清理：
+//       · 移除 backdrop-filter（html2canvas 不支持，会留白）
+//       · 将 Framer Motion 动画元素强制设为 opacity:1 / transform:none
+//       · 隐藏所有导出按钮
+//       · 将 CSS 变量写入 cloned :root（保证颜色正确）
+//  4. 背景色向上遍历 DOM 树取得第一个不透明背景
+//  5. windowWidth 设为文档宽度，防止响应式断点意外触发缩小
+//
+function ExportButton({ filename, label = "导出 PNG", target }) {
+  const [busy, setBusy] = useState(false);
+  const selfRef = useRef(null);
+
+  const onClick = async (e) => {
+    e.stopPropagation();
+    const node = target?.current || selfRef.current?.closest(".card");
+    if (!node || !window.html2canvas) {
+      console.warn("html2canvas not loaded or node missing");
+      return;
+    }
+    setBusy(true);
+
+    // ── Step 1: 滚动到视口内，等待布局稳定 ──────────────────────────────
+    node.scrollIntoView({ behavior: "instant", block: "nearest" });
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    await new Promise(r => setTimeout(r, 220));
+
+    // ── Step 2: 隐藏当前节点内所有导出按钮 ──────────────────────────────
+    const exportBtns = Array.from(node.querySelectorAll(".export-btn"));
+    exportBtns.forEach(b => (b.style.visibility = "hidden"));
+
+    // ── Step 3: 向上遍历 DOM 找到第一个不透明背景色 ─────────────────────
+    const resolvedBg = (() => {
+      let el = node;
+      while (el) {
+        const bg = getComputedStyle(el).backgroundColor;
+        if (bg && bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") return bg;
+        el = el.parentElement;
+      }
+      return "#f7f5f0";
+    })();
+
+    // ── Step 4: 读取当前滚动量，传给 html2canvas 做坐标校正 ─────────────
+    const sx = window.scrollX || window.pageXOffset || 0;
+    const sy = window.scrollY || window.pageYOffset || 0;
+
+    try {
+      const canvas = await window.html2canvas(node, {
+        backgroundColor: resolvedBg,
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+        // 关键：告知 html2canvas 当前滚动量，防止截图坐标错位
+        scrollX: -sx,
+        scrollY: -sy,
+        // 使用文档实际宽度，防止截图时触发响应式收窄
+        windowWidth: document.documentElement.scrollWidth,
+        windowHeight: document.documentElement.scrollHeight,
+        onclone: (clonedDoc) => {
+          // ── (a) 所有动画/过渡立即完成，定格在终态 ─────────────────────────────
+          //
+          // 根因：本页多处用 CSS animation + backwards fill + 逐行 delay 做入场效果：
+          //   · RD 时间线 24 行：slideIn，delay = idx×40ms，最长达 920ms
+          //   · 痛点分析条目：slideIn，delay = i×60ms
+          //   · 竞争态势列表：slideIn / slideUp，delay = i×60ms
+          //   · 气泡图气泡：bubbleIn，delay = i×30ms
+          // backwards fill-mode 让动画开始前元素保持 0% 帧（opacity:0）。
+          // html2canvas 截图时这些 delay 尚未走完，导致大量行/气泡不可见。
+          //
+          // 修复：一条 CSS 规则让所有动画在 0s 后以 0.001s 跑完并锁定 forwards 终态。
+          const animFixStyle = clonedDoc.createElement("style");
+          animFixStyle.textContent = `
+            *, *::before, *::after {
+              animation-duration:   0.001s !important;
+              animation-delay:      0s     !important;
+              animation-fill-mode:  forwards !important;
+              transition-duration:  0s     !important;
+              transition-delay:     0s     !important;
+            }
+          `;
+          clonedDoc.head.appendChild(animFixStyle);
+
+          // ── (b) Reveal 组件：inline style opacity:0 / translateY ───────────────
+          //
+          // Reveal 由 React state (seen) 控制 inline style。
+          // 若截图时 IntersectionObserver 未触发（用户未滚动到该区域），
+          // seen=false → opacity:0 / translateY(24px) 锁死在初始态，与动画无关。
+          // 需要直接覆盖 inline style。
+          clonedDoc.querySelectorAll("[style]").forEach(el => {
+            const s = el.style;
+            // opacity:0 → 1
+            if (s.opacity === "0") s.opacity = "1";
+            // translateY(任意值) → 0
+            if (s.transform && s.transform.includes("translateY")) {
+              s.transform = s.transform.replace(/translateY\([^)]+\)/g, "translateY(0px)");
+            }
+            // translateX(任意值) → 0（slideIn 用的是 X 方向）
+            if (s.transform && s.transform.includes("translateX")) {
+              s.transform = s.transform.replace(/translateX\([^)]+\)/g, "translateX(0px)");
+            }
+          });
+
+          // ── (c) 隐藏克隆文档中所有导出按钮 ──────────────────────────────────
+          clonedDoc.querySelectorAll(".export-btn").forEach(b => {
+            b.style.display = "none";
+          });
+
+          // ── (d) 移除 backdrop-filter — html2canvas 不支持，截图区域留白 ────────
+          clonedDoc.querySelectorAll("*").forEach(el => {
+            const s = el.style;
+            const hasBdf = s.backdropFilter || s.webkitBackdropFilter;
+            if (hasBdf) {
+              s.backdropFilter = "none";
+              s.webkitBackdropFilter = "none";
+              if (!s.backgroundColor || s.backgroundColor === "rgba(0, 0, 0, 0)") {
+                s.backgroundColor = "rgba(255,255,255,0.92)";
+              }
+            }
+            if (el.classList && el.classList.contains("card-glass")) {
+              s.backdropFilter = "none";
+              s.webkitBackdropFilter = "none";
+              s.backgroundColor = "rgba(255,255,255,0.95)";
+            }
+          });
+
+          // ── (e) 解析根节点 CSS 变量写入 :root，保证 var() 在截图中正确渲染 ────
+          const rootStyles = getComputedStyle(document.documentElement);
+          const varNames = ["--bg","--bg-2","--bg-3","--ink","--ink-2","--ink-3","--ink-4",
+                            "--line","--line-2","--accent","--accent-2","--accent-warm",
+                            "--good","--bad"];
+          const cssVarStyle = clonedDoc.createElement("style");
+          cssVarStyle.textContent = ":root{" +
+            varNames.map(v => `${v}:${rootStyles.getPropertyValue(v).trim()}`).join(";") + "}";
+          clonedDoc.head.appendChild(cssVarStyle);
+        },
+      });
+
+      const dataUrl = canvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = (filename || "chart") + ".png";
+      a.click();
+    } catch (err) {
+      console.error("export failed", err);
+      alert("导出失败：" + err.message);
+    }
+
+    exportBtns.forEach(b => (b.style.visibility = ""));
+    setBusy(false);
+  };
+
+  return (
+    <button ref={selfRef} data-cursor className="export-btn mono" onClick={onClick} disabled={busy}>
+      {busy ? "⋯ 渲染中" : "↓ " + label}
+    </button>
+  );
+}
+
+// ---- Data export (XLSX) -------------------------------------------------
+function DataExportButton({ filename, sheets, label = "XLSX" }) {
+  const onClick = (e) => {
+    e.stopPropagation();
+    if (!window.XLSX) { alert("XLSX 库未加载"); return; }
+    const wb = window.XLSX.utils.book_new();
+    Object.entries(sheets).forEach(([name, rows]) => {
+      const ws = window.XLSX.utils.json_to_sheet(rows);
+      window.XLSX.utils.book_append_sheet(wb, ws, name.slice(0, 31));
+    });
+    window.XLSX.writeFile(wb, (filename || "data") + ".xlsx");
+  };
+  return (
+    <button data-cursor className="export-btn export-btn-data mono" onClick={onClick}>
+      ⇩ {label}
+    </button>
+  );
+}
+
+// Export to globals
+Object.assign(window, {
+  useSmoothScroll, Reveal, Counter, Cursor, Magnet, Sparkline, useTooltip, fmt, ExportButton, DataExportButton,
+});
+
+</script>
+<!-- =============================================================
+  组件 00 — Navigation + Hero Section
+============================================================= -->
+<script type="text/babel">
+// Navigation + Hero
+const ROUTES = [
+{ id: "hero", label: "首页", num: "00" },
+{ id: "market", label: "在售车型分析", num: "01" },
+{ id: "rd", label: "在研项目分析", num: "02" },
+{ id: "pain", label: "痛点机会点", num: "03" },
+{ id: "compete", label: "竞争态势", num: "04" },
+{ id: "a0", label: "A0/A00专题", num: "05" }];
+
+
+function Nav() {
+  const [compact, setCompact] = useState(false);
+  const [active, setActive] = useState("hero");
+  useEffect(() => {
+    const onScroll = () => {
+      setCompact(window.scrollY > 60);
+      // active section detection
+      const y = window.scrollY + window.innerHeight * 0.35;
+      let curr = "hero";
+      for (const r of ROUTES) {
+        const el = document.getElementById(r.id);
+        if (el && el.offsetTop <= y) curr = r.id;
+      }
+      setActive(curr);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const scrollTo = (id) => {
+    const el = document.getElementById(id);if (!el) return;
+    window.scrollTo({ top: el.offsetTop - 60, behavior: "smooth" });
+  };
+
+  return (
+    <nav className={`nav ${compact ? "compact" : ""}`}>
+      <div className="nav-logo">
+        <div className="nav-dot"></div>
+        <span className="disp" style={{ fontSize: 16, fontWeight: 600, letterSpacing: "-0.02em" }}>EV-Analysis</span>
+        <span className="mono caption" style={{ marginLeft: 4, color: "var(--ink-4)" }}>v2026.05</span>
+      </div>
+      <div className="nav-links">
+        {ROUTES.map((r) =>
+        <div key={r.id} className={`nav-link ${active === r.id ? "active" : ""}`} onClick={() => scrollTo(r.id)}>
+            <span className="num">{r.num}</span>
+            <span className="cn">{r.label}</span>
+          </div>
+        )}
+      </div>
+      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <div className="nav-cta">
+          <span className="live-dot"></span>
+          <span>LIVE · EU MKT</span>
+        </div>
+        <Magnet>
+          <div className="nav-cta" data-cursor style={{ background: "var(--ink)", color: "var(--bg)", border: "1px solid var(--ink)" }}>
+            <span>EXPORT REPORT</span>
+            <span style={{ fontSize: 14 }}>↗</span>
+          </div>
+        </Magnet>
+      </div>
+    </nav>);
+
+}
+
+// ----- Hero with animated headline + 3D scene placeholder -------------------
+function Hero() {
+  const heroRef = useRef(null);
+  const [mp, setMp] = useState({ x: 0.5, y: 0.5 });
+  useEffect(() => {
+    const onMove = (e) => {
+      const r = heroRef.current?.getBoundingClientRect();if (!r) return;
+      setMp({ x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height });
+    };
+    window.addEventListener("mousemove", onMove);
+    return () => window.removeEventListener("mousemove", onMove);
+  }, []);
+
+  return (
+    <section id="hero" className="hero grid-bg" ref={heroRef} data-screen-label="00 Hero">
+      {/* 3D-feel parallax shapes */}
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden" }}>
+        <ParallaxShapes mp={mp} />
+      </div>
+
+      <div className="container" style={{ position: "relative", zIndex: 2 }}>
+        <div className="hero-eyebrow">
+          <span>EUROPEAN EV MARKET INTELLIGENCE</span>
+          <span style={{ color: "var(--ink-4)" }}>·</span>
+          <span>2025 / 26</span>
+          <span style={{ color: "var(--ink-4)" }}>·</span>
+          <span>FOR CATL STRATEGY OFFICE</span>
+        </div>
+
+        <h1 className="h-display disp" style={{ maxWidth: 1200 }}>
+          Decoding the<br />
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 24 }}>
+            <em style={{ fontStyle: "italic", color: "var(--accent-warm)", fontWeight: 400 }}>electric</em>
+            <ArrowGlyph />
+            shift.
+          </span>
+        </h1>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, marginTop: 64, alignItems: "end" }}>
+          <p className="body-lg cn" style={{ maxWidth: 540 }}>
+            一个面向汽车产品策略团队的洞察平台 — 通过<strong style={{ color: "var(--ink)" }}>市场、在研项目、用户声音、竞争态势</strong>四个维度，
+            实时解码欧洲乘用车电动化的真实节奏与下一波机会。
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
+            <div className="stat">
+              <div className="stat-num"><Counter to={2.59} decimals={2} suffix="M" /></div>
+              <div className="stat-lbl">2025 EU BEV REGISTRATIONS</div>
+            </div>
+            <div className="stat">
+              <div className="stat-num"><Counter to={29.7} decimals={1} suffix="%" /></div>
+              <div className="stat-lbl">YOY GROWTH</div>
+            </div>
+            <div className="stat">
+              <div className="stat-num"><Counter to={42.1} decimals={1} suffix="%" /></div>
+              <div className="stat-lbl">CATL GLOBAL SHARE</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Marquee */}
+      <div className="hero-marquee">
+        <div className="hero-marquee-track">
+          {Array.from({ length: 2 }).map((_, k) =>
+          <React.Fragment key={k}>
+              {window.MARKET_DATA.bubbles.slice(0, 18).map((b) =>
+            <span key={b.id + k} style={{ display: "inline-flex", gap: 14, alignItems: "center" }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: b.color }}></span>
+                  <span style={{ color: "var(--ink)" }}>{b.brand} {b.model}</span>
+                  <span>· {fmt.k(b.sales)} units</span>
+                  <span>· €{b.price}k</span>
+                </span>
+            )}
+            </React.Fragment>
+          )}
+        </div>
+      </div>
+    </section>);
+
+}
+
+function ArrowGlyph() {
+  return (
+    <svg width="92" height="92" viewBox="0 0 92 92" style={{ flexShrink: 0 }}>
+      <circle cx="46" cy="46" r="44" fill="none" stroke="#14171c" strokeWidth="1" strokeDasharray="2 4" opacity=".5">
+        <animateTransform attributeName="transform" type="rotate" from="0 46 46" to="360 46 46" dur="40s" repeatCount="indefinite" />
+      </circle>
+      <circle cx="46" cy="46" r="32" fill="#14171c" />
+      <path d="M36 46 L56 46 M48 38 L56 46 L48 54" stroke="#f7f5f0" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>);
+
+}
+
+function ParallaxShapes({ mp }) {
+  const tx = (depth) => `translate(${(mp.x - 0.5) * depth}px, ${(mp.y - 0.5) * depth}px)`;
+  return (
+    <>
+      <div style={{ position: "absolute", right: "8%", top: "18%", transform: tx(40), transition: "transform .3s" }}>
+        <svg width="280" height="280" viewBox="0 0 280 280">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#1d3a5f" stopOpacity=".1" />
+              <stop offset="100%" stopColor="#1d3a5f" stopOpacity=".02" />
+            </linearGradient>
+          </defs>
+          <circle cx="140" cy="140" r="140" fill="url(#g1)" />
+          <circle cx="140" cy="140" r="100" fill="none" stroke="#14171c" strokeWidth=".5" opacity=".25" />
+          <circle cx="140" cy="140" r="60" fill="none" stroke="#14171c" strokeWidth=".5" opacity=".25" />
+        </svg>
+      </div>
+      <div style={{ position: "absolute", left: "6%", bottom: "22%", transform: tx(-30), transition: "transform .3s" }}>
+        <svg width="180" height="180" viewBox="0 0 180 180">
+          <g fill="none" stroke="#14171c" strokeWidth=".5" opacity=".4">
+            {Array.from({ length: 12 }).map((_, i) =>
+            <line key={i} x1="90" y1="90" x2={90 + 80 * Math.cos(i / 12 * Math.PI * 2)} y2={90 + 80 * Math.sin(i / 12 * Math.PI * 2)} />
+            )}
+            <circle cx="90" cy="90" r="80" />
+            <circle cx="90" cy="90" r="50" />
+          </g>
+          <circle cx="90" cy="90" r="6" fill="#c97a4a" />
+        </svg>
+      </div>
+      <div style={{ position: "absolute", right: "22%", bottom: "30%", transform: tx(20), transition: "transform .3s" }}>
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <rect x="20" y="20" width="80" height="80" fill="none" stroke="#14171c" strokeWidth="1" opacity=".3" />
+          <rect x="20" y="20" width="80" height="80" fill="none" stroke="#c97a4a" strokeWidth="1" transform="rotate(15 60 60)" />
+        </svg>
+      </div>
+    </>);
+
+}
+
+Object.assign(window, { Nav, Hero, ROUTES });
+</script>
+<!-- =============================================================
+  组件 01 — 在售车型分析 MarketSection
+============================================================= -->
+<script type="text/babel">
+// Page 1 — 在售车型分析 (Market sales analysis)
+
+function MarketSection() {
+  const data = window.MARKET_DATA;
+  const [country, setCountry] = useState("ALL");
+  const [filters, setFilters] = useState({ brand:"ALL", seg:"ALL", power:"ALL" });
+
+  // Build country→models map from countryTops
+  const countryModels = {};
+  data.countryTops.forEach(c => { countryModels[c.code] = c.tops.map(t => t.model); });
+
+  const filtered = data.bubbles.filter(b => {
+    if (country !== "ALL") {
+      const list = countryModels[country] || [];
+      if (!list.some(m => m.toLowerCase().includes(b.model.toLowerCase().split(" ")[0]) || b.model.toLowerCase().includes(m.toLowerCase().split(" ")[0]))) return false;
+    }
+    return (filters.brand==="ALL" || b.brand===filters.brand) &&
+           (filters.seg==="ALL" || b.seg.startsWith(filters.seg)) &&
+           (filters.power==="ALL" || b.power===filters.power);
+  });
+
+  const activeCountry = data.countryTops.find(c => c.code === country);
+
+  return (
+    <section id="market" data-screen-label="01 在售车型分析" style={{background:"var(--bg)"}}>
+      <div className="container">
+        <Reveal>
+          <div className="section-tag mono">01 / 在售车型分析 · MARKET</div>
+        </Reveal>
+        <Reveal delay={80}>
+          <h2 className="h1 disp" style={{maxWidth: 1100, marginBottom: 24}}>
+            What does Europe<br/>actually <em style={{color:"var(--accent-warm)", fontStyle:"italic"}}>buy</em>?
+          </h2>
+        </Reveal>
+        <Reveal delay={140}>
+          <p className="body-lg cn" style={{maxWidth: 720, marginBottom: 32}}>
+            基于 EV-Volumes / JATO / ACEA 公开数据。X = 售价，Y = 电池容量，气泡 = 销量，颜色 = 动力。
+            点击国家筛选 — 查看该国 Top 5 高销车型 + 热销原因。
+          </p>
+        </Reveal>
+
+        <CountrySelector countryTops={data.countryTops} active={country} setActive={setCountry} />
+        <div style={{height: 18}}></div>
+        <FilterBar filters={filters} setFilters={setFilters} bubbles={data.bubbles} matched={filtered.length} total={data.bubbles.length} />
+        <div style={{height: 24}}></div>
+
+        <BubbleChart bubbles={filtered} allBubbles={data.bubbles} />
+
+        {activeCountry && <CountryTopList country={activeCountry} />}
+
+        <div style={{height: 80}}></div>
+
+        <CountryAndBrand data={data} />
+
+        <div style={{height: 80}}></div>
+
+        <BevRankSection />
+
+        <div style={{height: 80}}></div>
+
+        <PowertrainEvolution data={data.mix} />
+
+        <div style={{height: 80}}></div>
+
+        <GrowthDrivers drivers={data.drivers} />
+      </div>
+    </section>
+  );
+}
+
+function CountrySelector({ countryTops, active, setActive }) {
+  return (
+    <div style={{display:"flex", gap:10, flexWrap:"wrap"}}>
+      <div data-cursor onClick={()=>setActive("ALL")}
+        className={`chip mono ${active==="ALL"?"active":""}`}
+        style={{padding:"10px 16px", fontSize:12}}>ALL EUROPE</div>
+      {countryTops.map(c => (
+        <div key={c.code} data-cursor onClick={()=>setActive(c.code)}
+          className={`chip mono ${active===c.code?"active":""}`}
+          style={{padding:"10px 16px", fontSize:12, gap:8}}>
+          <span style={{fontSize:16}}>{c.flag}</span>
+          {c.name} <span style={{opacity:.5}}>· {fmt.k(c.units)}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CountryTopList({ country }) {
+  return (
+    <div className="card" style={{padding:32, marginTop:24, animation:"slideIn .5s cubic-bezier(.2,.8,.2,1)"}}>
+      <ExportButton filename={`top5-${country.code}`} />
+      <DataExportButton filename={`top5-${country.code}`} sheets={{ "Top 5": country.tops.map(t=>({ Model:t.model, Units:t.units, Why:t.why })) }} />
+      <div style={{display:"flex", justifyContent:"space-between", alignItems:"start", marginBottom:24, gap:24}}>
+        <div>
+          <div className="caption mono" style={{color:"var(--accent-warm)"}}>{country.flag} {country.code} · TOP 5 EV MODELS · 2025</div>
+          <div className="h3 cn" style={{marginTop:6}}>{country.name} · {country.headline}</div>
+        </div>
+        <div className="disp" style={{fontSize:32, fontWeight:500, color:"var(--ink-3)"}}>{fmt.comma(country.units)}</div>
+      </div>
+      <div style={{display:"grid", gap:14}}>
+        {country.tops.map((t, i) => (
+          <div key={t.model} style={{display:"grid", gridTemplateColumns:"40px 200px 100px 1fr", gap:18, padding:"14px 0", borderTop: i===0?"none":"1px solid var(--line-2)", alignItems:"start"}}>
+            <div className="disp" style={{fontSize:24, fontWeight:500, color:"var(--accent-warm)"}}>0{i+1}</div>
+            <div>
+              <div style={{fontSize:15, fontWeight:500}}>{t.model}</div>
+              <div className="mono caption" style={{marginTop:2}}>{fmt.comma(t.units)} units</div>
+            </div>
+            <div className="bar-track" style={{height:6, marginTop:8}}>
+              <div className="bar-fill" style={{width:`${(t.units/country.tops[0].units)*100}%`, background:"linear-gradient(90deg,#1d3a5f,#c97a4a)"}}></div>
+            </div>
+            <div className="cn caption" style={{fontSize:12.5, lineHeight:1.55, color:"var(--ink-2)"}}>
+              <strong style={{color:"var(--ink)"}}>WHY · </strong>{t.why}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ---- Filter Bar ---------------------------------------------------------
+function FilterBar({ filters, setFilters, bubbles, matched, total }) {
+  const brands  = ["ALL", ...new Set(bubbles.map(b=>b.brand))];
+  const segs    = ["ALL","A","B","C","D"];
+  const powers  = ["ALL","BEV","PHEV","HEV","ICE"];
+  const set = (k,v) => setFilters(f=>({...f,[k]:v}));
+  const reset = () => setFilters({brand:"ALL",seg:"ALL",power:"ALL"});
+  return (
+    <div className="card" style={{padding:"18px 22px", display:"flex", gap:24, alignItems:"center", flexWrap:"wrap"}}>
+      <div className="caption mono" style={{fontWeight:500}}>FILTER</div>
+      <FilterGroup label="BRAND"  value={filters.brand}  options={brands}  onChange={v=>set("brand",v)} />
+      <FilterGroup label="SEG"    value={filters.seg}    options={segs}    onChange={v=>set("seg",v)} />
+      <FilterGroup label="POWER"  value={filters.power}  options={powers}  onChange={v=>set("power",v)} />
+      <div style={{marginLeft:"auto", display:"flex", gap:14, alignItems:"center"}}>
+        <span className="mono caption">MATCHED <strong style={{color:"var(--ink)", fontSize:14}}>{matched}</strong> / {total||bubbles.length}</span>
+        <span className="chip mono" data-cursor onClick={reset} style={{fontSize:11}}>RESET ↻</span>
+      </div>
+    </div>
+  );
+}
+function FilterGroup({ label, value, options, onChange }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{position:"relative"}} data-no-smooth>
+      <div data-cursor onClick={()=>setOpen(o=>!o)} style={{display:"flex", gap:8, alignItems:"center", cursor:"pointer", padding:"6px 12px", border:"1px solid var(--line-2)", borderRadius:999, background:value==="ALL"?"transparent":"var(--ink)", color:value==="ALL"?"var(--ink-3)":"var(--bg)"}}>
+        <span className="mono caption" style={{color:"inherit", opacity:.7}}>{label}</span>
+        <span className="mono" style={{fontSize:12, fontWeight:500}}>{value}</span>
+        <span style={{fontSize:9, opacity:.6}}>▼</span>
+      </div>
+      {open && (
+        <div className="card" style={{position:"absolute", top:"calc(100% + 6px)", left:0, padding:6, zIndex:30, minWidth:120, maxHeight:240, overflowY:"auto"}}>
+          {options.map(o => (
+            <div key={o} data-cursor onClick={()=>{onChange(o); setOpen(false);}}
+              style={{padding:"6px 12px", fontSize:12, fontFamily:"var(--ff-mono)", borderRadius:6, cursor:"pointer", background:o===value?"var(--bg-2)":"transparent"}}>
+              {o}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---- Bubble chart -------------------------------------------------------
+const POWER_COLORS = { BEV:"#1d3a5f", PHEV:"#c97a4a", HEV:"#b8845a", ICE:"#5a6271" };
+function BubbleChart({ bubbles, allBubbles }) {
+  const [hover, setHover] = useState(null);
+  const containerRef = useRef(null);
+  const [dim, setDim] = useState({ w: 1200, h: 580 });
+
+  useLayoutEffect(() => {
+    const onResize = () => {
+      const r = containerRef.current?.getBoundingClientRect(); if (!r) return;
+      setDim({ w: r.width, h: r.height });
+    };
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  const padding = { l: 80, r: 40, t: 40, b: 60 };
+  const xMin = 10, xMax = 80;
+  const yMin = 0, yMax = 100;
+  const maxSales = Math.max(...allBubbles.map(b=>b.sales));
+
+  const visible = bubbles;
+
+  const xS = (v) => padding.l + ((v - xMin)/(xMax - xMin)) * (dim.w - padding.l - padding.r);
+  const yS = (v) => dim.h - padding.b - ((v - yMin)/(yMax - yMin)) * (dim.h - padding.t - padding.b);
+  const rS = (v) => 10 + Math.sqrt(v / maxSales) * 60;
+
+  return (
+    <div className="card" style={{padding: 24, position:"relative"}}>
+      <ExportButton filename="bubble-price-kwh-sales" />
+      <DataExportButton filename="bubble-models" sheets={{ Models: visible.map(b=>({ Model:b.model, Brand:b.brand, Segment:b.seg, Power:b.power, Price_EUR_k:b.price, Battery_kWh:b.kwh, Sales_2025:b.sales })) }} />
+      <div style={{display:"flex", justifyContent:"space-between", alignItems:"start", marginBottom: 20}}>
+        <div>
+          <div className="h3 cn" style={{marginBottom: 6}}>价格 × 电量 × 销量 — 爆款规律解构</div>
+          <div className="caption">X = MSRP € · Y = battery (kWh) · Bubble = 2025 sales · Color = powertrain</div>
+        </div>
+        <div style={{display:"flex", gap:14}}>
+          {Object.entries(POWER_COLORS).map(([k,c]) => (
+            <span key={k} className="mono caption" style={{display:"flex", alignItems:"center", gap:6, fontSize:11}}>
+              <span style={{width:10, height:10, borderRadius:"50%", background:c}}></span>{k}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div ref={containerRef} className="bubble-chart-wrap" style={{height: 580}}>
+        <svg width={dim.w} height={dim.h} style={{position:"absolute", inset:0}}>
+          {/* Grid lines */}
+          {[0, 20, 40, 60, 80, 100].map(t => (
+            <g key={t}>
+              <line x1={padding.l} x2={dim.w - padding.r} y1={yS(t)} y2={yS(t)} stroke="var(--line-2)" strokeDasharray="2 4"/>
+              <text x={padding.l - 12} y={yS(t)+4} fontSize="10" textAnchor="end" fill="var(--ink-4)" fontFamily="var(--ff-mono)">{t} kWh</text>
+            </g>
+          ))}
+          {[15, 25, 35, 45, 55, 65, 75].map(t => (
+            <g key={t}>
+              <line x1={xS(t)} x2={xS(t)} y1={padding.t} y2={dim.h - padding.b} stroke="var(--line-2)" strokeDasharray="2 4"/>
+              <text x={xS(t)} y={dim.h - padding.b + 18} fontSize="10" textAnchor="middle" fill="var(--ink-4)" fontFamily="var(--ff-mono)">€{t}k</text>
+            </g>
+          ))}
+          {/* Axis labels */}
+          <text x={padding.l} y={padding.t - 14} fontSize="10" fill="var(--ink-3)" fontFamily="var(--ff-mono)">BATTERY (kWh)</text>
+          <text x={dim.w - padding.r} y={dim.h - padding.b + 38} fontSize="10" fill="var(--ink-3)" fontFamily="var(--ff-mono)" textAnchor="end">PRICE →</text>
+
+          {/* "Sweet spot" annotation */}
+          <rect x={xS(20)} y={yS(80)} width={xS(45)-xS(20)} height={yS(40)-yS(80)} fill="#c97a4a" opacity="0.06" rx="6"/>
+          <text x={xS(32)} y={yS(80)-8} fontSize="10" fill="#c97a4a" fontFamily="var(--ff-mono)" textAnchor="middle">SWEET SPOT · €20–45k / 40–80 kWh</text>
+        </svg>
+
+        {visible.map((b, i) => {
+          const cx = xS(b.price), cy = yS(b.kwh || 1), r = rS(b.sales);
+          const isHover = hover && hover.id === b.id;
+          return (
+            <div
+              key={b.id}
+              className={`bubble ${hover && !isHover ? "dim" : ""}`}
+              data-cursor
+              style={{
+                left: cx - r, top: cy - r, width: r*2, height: r*2,
+                background: POWER_COLORS[b.power] || b.color,
+                animation: `bubbleIn .8s ${i*30}ms cubic-bezier(.2,.8,.2,1) backwards`,
+              }}
+              onMouseEnter={()=>setHover(b)}
+              onMouseLeave={()=>setHover(null)}
+            >
+              {r > 22 && <span style={{fontSize: r > 32 ? 11 : 10, padding: 4, textAlign:"center", lineHeight:1.1}}>{b.model}</span>}
+            </div>
+          );
+        })}
+
+        {hover && (
+          <div className="card-glass" style={{position:"absolute", left: 24, bottom: 24, padding: 16, minWidth: 260, zIndex: 20}}>
+            <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom: 10}}>
+              <div>
+                <div className="caption mono">{hover.brand.toUpperCase()} · {hover.power} · {hover.seg}</div>
+                <div className="h3 disp">{hover.model}</div>
+              </div>
+              <div style={{width: 36, height: 36, borderRadius: "50%", background: hover.color}}></div>
+            </div>
+            <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap: 12}}>
+              <div><div className="caption">Sales (2025)</div><div className="mono" style={{fontSize: 16, fontWeight: 500}}>{fmt.comma(hover.sales)}</div></div>
+              <div><div className="caption">Price</div><div className="mono" style={{fontSize: 16, fontWeight: 500}}>€{hover.price}k</div></div>
+              <div><div className="caption">Battery</div><div className="mono" style={{fontSize: 16, fontWeight: 500}}>{hover.kwh} kWh</div></div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Legend / Insights */}
+      <div style={{display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", gap: 16, marginTop: 24, paddingTop: 24, borderTop: "1px solid var(--line-2)"}}>
+        <div>
+          <div className="caption mono">INSIGHT</div>
+          <div className="cn" style={{fontSize: 14, lineHeight: 1.5, marginTop: 6, color:"var(--ink-2)"}}>
+            爆款集中在 <strong>€20–45k × 50–180k 单元</strong>区间，电池在 <strong>40–77 kWh</strong> 之间。Tesla Model Y 仍为单点冠军，但 VW/Skoda 的多车型矩阵已合力反超。
+          </div>
+        </div>
+        <KPI label="爆款车型数" v={11} suffix=" / 30" />
+        <KPI label="平均售价" v={36.4} prefix="€" suffix="k" decimals={1} />
+        <KPI label="平均电量" v={56.8} suffix=" kWh" decimals={1} />
+      </div>
+
+      <style>{`@keyframes bubbleIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }`}</style>
+    </div>
+  );
+}
+
+function KPI({ label, v, suffix, prefix, decimals=0 }) {
+  return (
+    <div>
+      <div className="caption mono">{label.toUpperCase()}</div>
+      <div className="disp" style={{fontSize: 28, fontWeight:500, marginTop:4}}>
+        <Counter to={v} suffix={suffix} prefix={prefix} decimals={decimals}/>
+      </div>
+    </div>
+  );
+}
+
+// ---- Country share + Brand bar combo ------------------------------------
+function CountryAndBrand({ data }) {
+  return (
+    <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap: 24}}>
+      <Reveal>
+        <div className="card" style={{padding: 32}}>
+          <ExportButton filename="by-country" />
+          <DataExportButton filename="by-country" sheets={{ Countries: data.countries }} />
+          <div className="caption mono" style={{marginBottom: 6}}>BY COUNTRY · 2025 BEV</div>
+          <div className="h3 cn" style={{marginBottom: 24}}>欧洲市场地理分布</div>
+          <div>
+            {data.countries.map(c => (
+              <div key={c.code} className="bar-row">
+                <div style={{display:"flex", gap: 10, alignItems:"center"}}>
+                  <span className="mono caption" style={{width: 24, color:"var(--ink-4)"}}>{c.code}</span>
+                  <span className="cn" style={{fontSize: 13}}>{c.name}</span>
+                </div>
+                <div className="bar-track">
+                  <div className="bar-fill" style={{width: `${c.share*4.5}%`, background: c.growth >= 0 ? "linear-gradient(90deg,#1d3a5f,#3a6592)" : "linear-gradient(90deg,#b04a3a,#d97560)"}}></div>
+                </div>
+                <div style={{display:"flex", justifyContent:"flex-end", gap: 8, alignItems:"center"}}>
+                  <span className="mono caption" style={{fontSize: 11}}>{c.share}%</span>
+                  <span className="mono caption" style={{color: c.growth>=0?"var(--good)":"var(--bad)", fontSize: 11}}>{fmt.pct(c.growth, 1)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Reveal>
+
+      <Reveal delay={120}>
+        <div className="card" style={{padding: 32}}>
+          <ExportButton filename="by-brand" />
+          <DataExportButton filename="by-brand" sheets={{ Brands: data.brands.map(b=>({ Brand:b.name, BEV:b.bev, PHEV:b.phev, Total:b.bev+b.phev, YoY_pct:b.growth })) }} />
+          <div className="caption mono" style={{marginBottom: 6}}>BY BRAND · BEV + PHEV STACK</div>
+          <div className="h3 cn" style={{marginBottom: 24}}>品牌矩阵 · 含混动叠加</div>
+          <div>
+            {data.brands.map(b => {
+              const total = b.bev + b.phev;
+              const max = 450000;
+              return (
+                <div key={b.name} className="bar-row" style={{gridTemplateColumns:"110px 1fr 100px"}}>
+                  <div className="cn" style={{fontSize: 13, display:"flex", gap:8, alignItems:"center"}}>
+                    <span style={{width:8,height:8,borderRadius:"50%", background:b.flag}}></span>
+                    {b.name}
+                  </div>
+                  <div className="bar-track" style={{height: 14, background:"var(--bg-2)"}}>
+                    <div style={{display:"flex", height:"100%", width:`${(total/max)*100}%`, transition:"width 1.4s cubic-bezier(.2,.8,.2,1)"}}>
+                      <div style={{flex: b.bev, background: b.flag, borderRadius:"4px 0 0 4px"}}></div>
+                      <div style={{flex: b.phev, background: b.flag, opacity: 0.45, borderRadius:"0 4px 4px 0"}}></div>
+                    </div>
+                  </div>
+                  <div style={{display:"flex", justifyContent:"flex-end", gap:8}}>
+                    <span className="mono caption" style={{fontSize: 11}}>{fmt.k(total)}</span>
+                    <span className="mono caption" style={{color: b.growth>=0?"var(--good)":"var(--bad)", fontSize: 11}}>{fmt.pct(b.growth, 0)}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{display:"flex", gap:18, marginTop: 16, fontSize: 11}} className="mono">
+            <span style={{display:"flex", alignItems:"center", gap:6}}><span style={{width:10,height:8,background:"var(--ink)"}}></span>BEV</span>
+            <span style={{display:"flex", alignItems:"center", gap:6}}><span style={{width:10,height:8,background:"var(--ink)", opacity:.45}}></span>PHEV</span>
+          </div>
+        </div>
+      </Reveal>
+    </div>
+  );
+}
+
+// ============================================================
+// BEV 各级别销量排行气泡图组件
+// ============================================================
+const SEG_COLORS_RANK = { A:"#b8845a", B:"#1d3a5f", C:"#2f7d5b", D:"#7d3c98", E:"#b04a3a" };
+const SEG_LABEL_RANK  = { A:"A级", B:"B级", C:"C级", D:"D级", E:"E级" };
+
+function BevRankSection() {
+  const allData   = window.BEV_RANK_DATA;
+  const insights  = window.BEV_RANK_INSIGHTS;
+  const [seg,  setSeg]  = useState("D");
+  const [type, setType] = useState("SUV");
+
+  const filtered   = allData.filter(d => d.seg === seg && d.type === type);
+  const insightKey = `${seg}-${type}`;
+  const insight    = insights[insightKey];
+
+  return (
+    <Reveal>
+      <div className="card" style={{padding: 32}}>
+        {/* ── 标题 ── */}
+        <div style={{marginBottom: 24}}>
+          <div className="caption mono" style={{color:"var(--accent-warm)", marginBottom:6}}>BEV RANKING · 2025 EUROPE · TOP 10 PER SEGMENT</div>
+          <div className="h3 cn" style={{marginBottom:8}}>各级别销量前十 — 价格 × 电量 × 销量解构</div>
+          <div className="caption" style={{color:"var(--ink-3)"}}>X = 欧洲起售价 (€k) · Y = 电池容量 (kWh) · 气泡大小 = 年销量 · 来源：EV-Volumes 2025</div>
+        </div>
+
+        {/* ── 筛选器 ── */}
+        <div style={{display:"flex", gap:24, alignItems:"center", marginBottom:24, flexWrap:"wrap"}}>
+          <div style={{display:"flex", gap:8, alignItems:"center", flexWrap:"wrap"}}>
+            <span className="caption mono" style={{marginRight:2, opacity:.55}}>级别</span>
+            {["A","B","C","D","E"].map(s => (
+              <div key={s} data-cursor onClick={()=>setSeg(s)}
+                style={{
+                  padding:"7px 15px", borderRadius:999, fontSize:12,
+                  fontFamily:"var(--ff-mono)", fontWeight:500, cursor:"pointer",
+                  background: seg===s ? SEG_COLORS_RANK[s] : "transparent",
+                  color: seg===s ? "#fff" : "var(--ink-3)",
+                  border:`1px solid ${seg===s ? SEG_COLORS_RANK[s] : "var(--line-2)"}`,
+                  transition:"all .18s ease",
+                }}>
+                {s} · {SEG_LABEL_RANK[s]}
+              </div>
+            ))}
+          </div>
+          <div style={{display:"flex", gap:8, alignItems:"center"}}>
+            <span className="caption mono" style={{marginRight:2, opacity:.55}}>类型</span>
+            {["CAR","SUV"].map(t => (
+              <div key={t} data-cursor onClick={()=>setType(t)}
+                style={{
+                  padding:"7px 18px", borderRadius:999, fontSize:12,
+                  fontFamily:"var(--ff-mono)", fontWeight:500, cursor:"pointer",
+                  background: type===t ? "var(--ink)" : "transparent",
+                  color: type===t ? "var(--bg)" : "var(--ink-3)",
+                  border:`1px solid ${type===t ? "var(--ink)" : "var(--line-2)"}`,
+                  transition:"all .18s ease",
+                }}>
+                {t}
+              </div>
+            ))}
+          </div>
+          {filtered.length > 0 && (
+            <span className="mono caption" style={{marginLeft:"auto", opacity:.5}}>
+              {filtered.length} 款 · {seg}-{type}
+            </span>
+          )}
+        </div>
+
+        {/* ── 气泡图 ── */}
+        {filtered.length > 0
+          ? <BevRankBubbleChart key={`${seg}-${type}`} data={filtered} segColor={SEG_COLORS_RANK[seg]} seg={seg} type={type} />
+          : <div style={{padding:80, textAlign:"center", color:"var(--ink-4)", fontFamily:"var(--ff-mono)", fontSize:12}}>暂无 {seg}-{type} 数据</div>
+        }
+
+        {/* ── 原因分析 ── */}
+        {insight && filtered.length > 0 && <BevRankInsight insight={insight} segColor={SEG_COLORS_RANK[seg]} />}
+      </div>
+    </Reveal>
+  );
+}
+
+function BevRankBubbleChart({ data, segColor, seg, type }) {
+  const [hover, setHover] = useState(null);
+  const containerRef = useRef(null);
+  const [dim, setDim] = useState({ w:1100, h:520 });
+
+  useLayoutEffect(() => {
+    const onResize = () => {
+      const r = containerRef.current?.getBoundingClientRect();
+      if (!r) return;
+      setDim({ w: r.width, h: r.height });
+    };
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  const pad = { l:80, r:44, t:50, b:64 };
+  const prices = data.map(d => d.price);
+  const kwhs   = data.map(d => d.kwh);
+  const xMin   = Math.max(0,  Math.floor(Math.min(...prices) * 0.85));
+  const xMax   = Math.ceil(Math.max(...prices) * 1.1);
+  const yMin   = Math.max(0,  Math.floor(Math.min(...kwhs)  * 0.8));
+  const yMax   = Math.ceil(Math.max(...kwhs)  * 1.12);
+  const maxSales = Math.max(...data.map(d => d.sales));
+
+  const xS = v => pad.l + ((v - xMin) / (xMax - xMin)) * (dim.w - pad.l - pad.r);
+  const yS = v => dim.h - pad.b - ((v - yMin) / (yMax - yMin)) * (dim.h - pad.t - pad.b);
+  const rS = v => 14 + Math.sqrt(v / maxSales) * 68;
+
+  // 动态刻度
+  const makeSteps = (lo, hi, n) => {
+    const raw = (hi - lo) / n;
+    const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const nice = [1,2,2.5,5,10].map(f=>f*mag).find(f=>f>=raw) || raw;
+    const start = Math.ceil(lo / nice) * nice;
+    const steps = [];
+    for (let v = start; v <= hi + 0.001; v = +(v + nice).toFixed(6)) steps.push(+v.toFixed(6));
+    return steps;
+  };
+  const xTicks = makeSteps(xMin, xMax, 6);
+  const yTicks = makeSteps(yMin, yMax, 5);
+
+  const sheetRows = data.map(d => ({
+    "排名": d.rank, "品牌": d.brand, "车型": d.model,
+    "年销量": d.sales, "起售价_欧元k": d.price,
+    "电池容量_kWh": d.kwh, "续航_km": d.range,
+    "级别类型": d.seg + "-" + d.type,
+  }));
+  const exportFile = "bev-rank-" + (seg || "all") + "-" + (type || "all");
+
+  return (
+    <div className="card" style={{position:"relative", padding:0, border:"none", boxShadow:"none", background:"transparent"}}>
+      <ExportButton filename={exportFile} />
+      <DataExportButton filename={exportFile}
+        sheets={{ [seg + "-" + type + " Top10"]: sheetRows }} />
+      <div ref={containerRef} className="bubble-chart-wrap"
+        style={{height:520, background:"var(--bg-3)", border:"1px solid var(--line-2)", borderRadius:14, overflow:"hidden", position:"relative"}}>
+      {/* SVG grid + axes */}
+      <svg width={dim.w} height={dim.h} style={{position:"absolute", inset:0, pointerEvents:"none"}}>
+        {yTicks.map(t => (
+          <g key={t}>
+            <line x1={pad.l} x2={dim.w-pad.r} y1={yS(t)} y2={yS(t)} stroke="var(--line-2)" strokeDasharray="2 4"/>
+            <text x={pad.l-10} y={yS(t)+4} fontSize="10" textAnchor="end" fill="var(--ink-4)" fontFamily="var(--ff-mono)">{t} kWh</text>
+          </g>
+        ))}
+        {xTicks.map(t => (
+          <g key={t}>
+            <line x1={xS(t)} x2={xS(t)} y1={pad.t} y2={dim.h-pad.b} stroke="var(--line-2)" strokeDasharray="2 4"/>
+            <text x={xS(t)} y={dim.h-pad.b+18} fontSize="10" textAnchor="middle" fill="var(--ink-4)" fontFamily="var(--ff-mono)">€{t}k</text>
+          </g>
+        ))}
+        <text x={pad.l} y={pad.t-20} fontSize="10" fill="var(--ink-3)" fontFamily="var(--ff-mono)">BATTERY (kWh) ↑</text>
+        <text x={dim.w-pad.r} y={dim.h-pad.b+40} fontSize="10" fill="var(--ink-3)" fontFamily="var(--ff-mono)" textAnchor="end">PRICE (€k) →</text>
+        {/* 排名标注 */}
+        {data.map(d => {
+          const cx = xS(d.price), cy = yS(d.kwh), r = rS(d.sales);
+          return <text key={d.model+"-rank"} x={cx} y={cy-r-6} fontSize="9" textAnchor="middle" fill="var(--ink-4)" fontFamily="var(--ff-mono)" fontWeight="500">#{d.rank}</text>;
+        })}
+      </svg>
+
+      {/* 气泡 */}
+      {data.map((d, i) => {
+        const cx = xS(d.price), cy = yS(d.kwh), r = rS(d.sales);
+        const isHover = hover && hover.model === d.model;
+        return (
+          <div key={d.model}
+            className={`bubble ${hover && !isHover ? "dim" : ""}`}
+            data-cursor
+            style={{
+              left: cx-r, top: cy-r, width: r*2, height: r*2,
+              background: segColor, opacity: 0.85,
+              animation: `bubbleIn .7s ${i*45}ms cubic-bezier(.2,.8,.2,1) backwards`,
+            }}
+            onMouseEnter={()=>setHover(d)}
+            onMouseLeave={()=>setHover(null)}
+          >
+            {r > 26 && (
+              <span style={{fontSize: r>38?11:9.5, padding:4, textAlign:"center", lineHeight:1.1, fontFamily:"var(--ff-cn)"}}>
+                {d.model.length > 12 ? d.model.slice(0,11)+"…" : d.model}
+              </span>
+            )}
+          </div>
+        );
+      })}
+
+      {/* 悬浮详情卡片 */}
+      {hover && (
+        <div className="card-glass" style={{position:"absolute", left:20, bottom:20, padding:18, minWidth:290, zIndex:20, animation:"slideIn .2s ease"}}>
+          <div style={{marginBottom:14}}>
+            <div className="caption mono" style={{color:"var(--ink-4)", marginBottom:3}}>
+              {hover.brand.toUpperCase()} · RANK #{hover.rank}
+            </div>
+            <div className="h3 disp" style={{lineHeight:1.2}}>{hover.model}</div>
+          </div>
+          <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:12}}>
+            <div>
+              <div className="caption" style={{fontSize:10, marginBottom:2, color:"var(--ink-4)"}}>年销量</div>
+              <div className="mono" style={{fontSize:17, fontWeight:600, color:segColor}}>{fmt.comma(hover.sales)}</div>
+            </div>
+            <div>
+              <div className="caption" style={{fontSize:10, marginBottom:2, color:"var(--ink-4)"}}>起售价</div>
+              <div className="mono" style={{fontSize:17, fontWeight:600}}>€{hover.price}k</div>
+            </div>
+            <div>
+              <div className="caption" style={{fontSize:10, marginBottom:2, color:"var(--ink-4)"}}>电池容量</div>
+              <div className="mono" style={{fontSize:17, fontWeight:600}}>{hover.kwh} kWh</div>
+            </div>
+            <div>
+              <div className="caption" style={{fontSize:10, marginBottom:2, color:"var(--ink-4)"}}>续航 (WLTP)</div>
+              <div className="mono" style={{fontSize:17, fontWeight:600}}>{hover.range} km</div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+    </div>
+  );
+}
+
+function BevRankInsight({ insight, segColor }) {
+  return (
+    <div style={{marginTop:28, paddingTop:24, borderTop:"1px solid var(--line-2)"}}>
+      <div style={{marginBottom:20}}>
+        <div className="caption mono" style={{color:"var(--accent-warm)", marginBottom:6}}>INSIGHT · 高销量原因解构</div>
+        <div className="h3 cn" style={{fontWeight:500}}>{insight.headline}</div>
+      </div>
+      <div style={{display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:14}}>
+        {insight.factors.map((f, i) => (
+          <div key={i} style={{
+            padding:"18px 20px", background:"var(--bg-2)", borderRadius:12,
+            borderLeft:`3px solid ${segColor}`, display:"flex", flexDirection:"column", gap:8,
+          }}>
+            <div style={{fontSize:22}}>{f.icon}</div>
+            <div className="caption mono" style={{color:segColor, fontSize:10, fontWeight:600}}>{f.tag}</div>
+            <div className="cn" style={{fontSize:12.5, lineHeight:1.65, color:"var(--ink-2)"}}>{f.text}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ---- Powertrain evolution stacked area -----------------------------------
+function PowertrainEvolution({ data }) {
+  const w = 1200, h = 280, pad = 40;
+  const stack = (d) => {
+    let acc = 0;
+    return ["bev","phev","hev","ice"].map(k => {
+      const start = acc; acc += d[k]; return { k, start, end: acc };
+    });
+  };
+  const yS = (v) => h - pad - (v / 100) * (h - pad*2);
+  const xS = (i) => pad + (i / (data.length - 1)) * (w - pad*2);
+
+  const colorMap = { bev:"#14171c", phev:"#5a6271", hev:"#9aa2b1", ice:"#d9d4c7" };
+  const labelMap = { bev:"BEV", phev:"PHEV", hev:"HEV", ice:"ICE+Diesel" };
+
+  return (
+    <Reveal>
+      <div className="card" style={{padding: 32}}>
+        <ExportButton filename="powertrain-mix" />
+        <DataExportButton filename="powertrain-mix" sheets={{ Mix: data }} />
+        <div style={{display:"flex", justifyContent:"space-between", alignItems:"start", marginBottom: 20}}>
+          <div>
+            <div className="caption mono">POWERTRAIN MIX EVOLUTION · EU</div>
+            <div className="h3 cn" style={{marginTop: 6}}>电气化进程：BEV 在 5 年内从 9% → 20%</div>
+          </div>
+          <div style={{display:"flex", gap: 16}}>
+            {Object.entries(labelMap).map(([k,l]) => (
+              <span key={k} className="mono caption" style={{display:"flex", alignItems:"center", gap:6}}>
+                <span style={{width:12, height:8, background: colorMap[k]}}></span>{l}
+              </span>
+            ))}
+          </div>
+        </div>
+        <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h}>
+          {["bev","phev","hev","ice"].map(k => {
+            const pts = data.map((d,i) => {
+              const s = stack(d).find(s => s.k === k);
+              return [xS(i), yS(s.start), yS(s.end)];
+            });
+            const dPath = pts.map((p,i) => (i?"L":"M")+p[0]+" "+p[1]).join(" ") + " " +
+                          pts.slice().reverse().map(p => "L"+p[0]+" "+p[2]).join(" ") + " Z";
+            return <path key={k} d={dPath} fill={colorMap[k]} opacity={k==="bev"?1:0.85}>
+              <animate attributeName="opacity" from="0" to={k==="bev"?1:0.85} dur="1.2s" fill="freeze"/>
+            </path>;
+          })}
+          {data.map((d,i) => (
+            <g key={d.year}>
+              <line x1={xS(i)} x2={xS(i)} y1={pad} y2={h-pad} stroke="rgba(255,255,255,0.15)"/>
+              <text x={xS(i)} y={h-pad+20} fontSize="11" textAnchor="middle" fill="var(--ink-3)" fontFamily="var(--ff-mono)">{d.year}</text>
+              <text x={xS(i)} y={yS(d.bev)-6} fontSize="11" textAnchor="middle" fill="white" fontFamily="var(--ff-mono)" fontWeight="500">{d.bev}%</text>
+            </g>
+          ))}
+        </svg>
+      </div>
+    </Reveal>
+  );
+}
+
+// ---- Growth driver narrative cards ---------------------------------------
+function GrowthDrivers({ drivers }) {
+  return (
+    <div>
+      <Reveal>
+        <div className="caption mono" style={{marginBottom: 6}}>WHY · 增长背后的真实原因</div>
+        <h2 className="h2 disp" style={{maxWidth: 800, marginBottom: 32}}>
+          Five forces<br/>shaping demand.
+        </h2>
+      </Reveal>
+      <div style={{display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap: 16}}>
+        {drivers.map((d, i) => (
+          <Reveal key={i} delay={i*80}>
+            <div className="card" style={{padding: 24, height:"100%", display:"flex", flexDirection:"column", justifyContent:"space-between", minHeight: 280}}>
+              <div>
+                <div className="mono caption" style={{color: "var(--accent-warm)"}}>{d.tag}</div>
+                <div className="disp" style={{fontSize: 36, fontWeight: 500, marginTop: 14, marginBottom: 12, color:"var(--ink)"}}>{d.lift}</div>
+                <div className="cn" style={{fontSize: 14, fontWeight: 500, marginBottom: 10}}>{d.title}</div>
+              </div>
+              <div className="cn caption" style={{lineHeight: 1.55, fontSize: 12.5, color:"var(--ink-3)"}}>{d.body}</div>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { MarketSection });
+
+</script>
+<!-- =============================================================
+  组件 02 — 在研项目分析 RDSection
+============================================================= -->
+<script type="text/babel">
+// Page 2 — 在研项目分析 (R&D pipeline)
+
+function RDSection() {
+  const data = window.RD_DATA;
+  return (
+    <section id="rd" data-screen-label="02 在研项目分析" style={{background:"var(--bg-2)"}}>
+      <div className="container">
+        <Reveal><div className="section-tag mono">02 / 在研项目分析 · R&D PIPELINE</div></Reveal>
+        <Reveal delay={80}>
+          <h2 className="h1 disp" style={{maxWidth: 1100, marginBottom: 24}}>
+            The next <em style={{color:"var(--accent-warm)", fontStyle:"italic"}}>{data.projects.length} cars</em><br/>are being engineered now.
+          </h2>
+        </Reveal>
+        <Reveal delay={140}>
+          <p className="body-lg cn" style={{maxWidth: 740, marginBottom: 56}}>
+            横向对比品牌间在研项目，纵向追踪同品牌车型迭代。从 SOP 时间线、电压架构、电量与续航能力中，预测 2026–27 量产车的真实竞争力。
+          </p>
+        </Reveal>
+
+        <RDTimeline projects={data.projects} />
+
+        <div style={{height: 80}}></div>
+
+        <PackTopology items={data.packCommonality} projects={data.projects} />
+
+        <div style={{height: 80}}></div>
+
+        <PackCommonality items={data.packCommonality} projects={data.projects} />
+      </div>
+    </section>
+  );
+}
+
+function RDTimeline({ projects }) {
+  const [seg, setSeg] = useState("ALL");
+  const filtered = projects.filter(p => seg==="ALL" || p.segment===seg);
+
+  // Timeline 2025Q4 -> 2027Q4 = 9 cells
+  const quarters = ["25Q4","26Q1","26Q2","26Q3","26Q4","27Q1","27Q2","27Q3","27Q4"];
+  const qIndex = (sop) => {
+    const s = String(sop);
+    if (/已上市|launched/i.test(s)) return 0;
+    const m = s.match(/(\d{4})\s*(Q\d|H\d|Fall|Spring)?/i);
+    if (!m) return 0;
+    const yr = parseInt(m[1]); const tag = (m[2]||"").toUpperCase();
+    const yIdx = (yr - 2025) * 4;
+    let qi = 3;
+    if (tag.startsWith("Q")) qi = parseInt(tag[1]) - 1;
+    else if (tag === "H1") qi = 1;
+    else if (tag === "H2") qi = 3;
+    else if (tag === "FALL") qi = 3;
+    return Math.max(0, Math.min(8, yIdx + qi - 3));
+  };
+
+  return (
+    <div className="card" style={{padding: 32}}>
+      <ExportButton filename="rd-timeline" />
+      <DataExportButton filename="rd-pipeline" sheets={{ Projects: filtered.map(p=>({ Code:p.code, OEM:p.oem, Model:p.model, Segment:p.segment, Pack:p.pack, kWh:p.kwh, kWh_alt:p.kwhAlt, Range_km:p.range, SOP:p.sop, Voltage:p.soc, Chemistry:p.chem, Status:p.status, Note:p.note })) }} />
+      <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom: 24, flexWrap:"wrap", gap:12}}>
+        <div>
+          <div className="caption mono">PROJECT SOP TIMELINE</div>
+          <div className="h3 cn" style={{marginTop: 6}}>{filtered.length} 个在研项目 · 时间 × OEM × 电量 · 按级别分组</div>
+        </div>
+        <div className="tabs" data-no-smooth>
+          {["ALL","A","B","C","D"].map(s => (
+            <div key={s} className={`tab mono ${seg===s?"active":""}`} onClick={()=>setSeg(s)}>SEG {s}</div>
+          ))}
+        </div>
+      </div>
+
+      {/* Quarter ruler */}
+      <div style={{display:"grid", gridTemplateColumns:`200px repeat(${quarters.length}, 1fr)`, gap: 4, paddingBottom: 14, borderBottom:"1px solid var(--line-2)"}}>
+        <div className="caption mono">PROJECT</div>
+        {quarters.map(q => <div key={q} className="caption mono" style={{textAlign:"center"}}>{q}</div>)}
+      </div>
+
+      <div style={{marginTop: 8}}>
+        {filtered.map((p, idx) => {
+          const qi = qIndex(p.sop);
+          return (
+            <div key={p.code}
+              style={{
+                display:"grid", gridTemplateColumns:`200px repeat(${quarters.length}, 1fr)`, gap: 4,
+                padding: "12px 0", borderBottom:"1px solid var(--line-2)",
+                animation: `slideIn .6s ${idx*40}ms cubic-bezier(.2,.8,.2,1) backwards`,
+              }}
+            >
+              <div>
+                <div className="cn" style={{fontSize: 13, fontWeight: 500}}>{p.oem} {p.model}</div>
+                <div className="mono caption" style={{fontSize: 10}}>{p.code} · {p.pack} · {p.soc}</div>
+              </div>
+              {quarters.map((q,i) => (
+                <div key={q} style={{position:"relative", height: 32, borderRadius: 6, background: i===qi ? "transparent" : "transparent"}}>
+                  {i===qi && (
+                    <div data-cursor style={{
+                      position:"absolute", inset: 4,
+                      background: p.status==="Launched" ? "var(--good)" : p.status==="Pre-prod" ? "#1d3a5f" : p.status==="Tooling" ? "#3a6592" : p.status==="Validation" ? "#b8845a" : p.status==="Engineering" ? "var(--ink-3)" : "var(--ink-4)",
+                      borderRadius: 4, color:"white", fontSize: 9.5, fontFamily:"var(--ff-mono)",
+                      display:"flex", alignItems:"center", justifyContent:"center", gap: 4, padding: "0 6px",
+                      whiteSpace:"nowrap", overflow:"hidden",
+                    }}>
+                      <span>{p.kwh}kWh</span>·<span>{p.range}km</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Status legend */}
+      <div style={{display:"flex", gap: 18, marginTop: 18, flexWrap:"wrap"}}>
+        {[["Launched","var(--good)"],["Pre-prod","#1d3a5f"],["Tooling","#3a6592"],["Validation","#b8845a"],["Engineering","var(--ink-3)"],["Concept","var(--ink-4)"]].map(([l,c]) => (
+          <span key={l} className="mono caption" style={{display:"flex", alignItems:"center", gap:6, fontSize: 11}}>
+            <span style={{width: 12, height: 10, background: c, borderRadius: 2}}></span>{l}
+          </span>
+        ))}
+      </div>
+
+      <style>{`@keyframes slideIn { 0% { opacity: 0; transform: translateX(-12px); } 100% { opacity: 1; transform: translateX(0); } }`}</style>
+    </div>
+  );
+}
+
+function PackCommonality({ items, projects }) {
+  return (
+    <Reveal>
+      <div>
+        <div className="caption mono" style={{marginBottom: 6}}>STD PACK OPPORTUNITY</div>
+        <h2 className="h2 disp" style={{maxWidth: 760, marginBottom: 8}}>
+          整车 → Pack 共性挖掘
+        </h2>
+        <p className="body cn" style={{maxWidth: 700, marginBottom: 32, color:"var(--ink-3)"}}>
+          基于在售 + 在研项目的电量带聚类，识别可横向展开的标准 Pack 大单品 — 提升模组复用率，压缩成本。
+        </p>
+
+        <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap: 16}}>
+          {items.map((p, i) => (
+            <div key={i} className="card" style={{padding: 28, position:"relative", overflow:"hidden"}}>
+              <div style={{position:"absolute", top:-30, right:-30, width:120, height:120, borderRadius:"50%", background:"var(--accent-warm)", opacity: 0.05}}></div>
+              <div className="caption mono" style={{color:"var(--accent-warm)"}}>STANDARD PACK · S{i+1}</div>
+              <div className="h3 disp" style={{margin:"12px 0", fontSize: 22}}>{p.pack}</div>
+
+              <div style={{display:"flex", gap: 16, margin:"18px 0 22px"}}>
+                <div>
+                  <div className="caption">协同度</div>
+                  <Radial value={p.synergy} />
+                </div>
+                <div style={{flex:1}}>
+                  <div className="caption">单车节省</div>
+                  <div className="disp" style={{fontSize: 28, fontWeight:500, marginTop: 4}}>{p.save}</div>
+                  <div className="caption mono" style={{marginTop: 8}}>{p.models.length} models · 横展候选</div>
+                </div>
+              </div>
+
+              <div style={{borderTop:"1px solid var(--line-2)", paddingTop: 14}}>
+                <div className="caption" style={{marginBottom: 8}}>候选车型</div>
+                <div style={{display:"flex", gap:6, flexWrap:"wrap"}}>
+                  {p.models.map(m => <span key={m} className="chip" style={{fontSize: 10.5, padding:"4px 9px"}}>{m}</span>)}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="card" style={{padding: 24, marginTop: 16, background: "var(--ink)", color:"var(--bg)", border:"1px solid var(--ink)"}}>
+          <div style={{display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", gap: 32, alignItems:"center"}}>
+            <div>
+              <div className="caption mono" style={{color:"#9aa2b1"}}>STRATEGIC IMPLICATION</div>
+              <div className="cn" style={{fontSize: 16, marginTop: 8, lineHeight:1.5}}>
+                3 套标准 Pack 可覆盖 14 款在研车型中的 12 款 — 模组复用率提升至 <strong>78%</strong>，BOM 成本下降约 €410/车均值。
+              </div>
+            </div>
+            <div className="stat"><div className="stat-num" style={{color:"var(--bg)"}}><Counter to={3} /></div><div className="stat-lbl" style={{color:"#9aa2b1"}}>STD PACKS</div></div>
+            <div className="stat"><div className="stat-num" style={{color:"var(--bg)"}}><Counter to={78} suffix="%"/></div><div className="stat-lbl" style={{color:"#9aa2b1"}}>REUSE RATE</div></div>
+            <div className="stat"><div className="stat-num" style={{color:"var(--bg)"}}>€<Counter to={410} /></div><div className="stat-lbl" style={{color:"#9aa2b1"}}>BOM SAVINGS / CAR</div></div>
+          </div>
+        </div>
+      </div>
+    </Reveal>
+  );
+}
+
+function Radial({ value, size=64, stroke=6 }) {
+  const r = (size - stroke) / 2;
+  const C = 2 * Math.PI * r;
+  return (
+    <svg width={size} height={size} style={{marginTop: 6}}>
+      <circle cx={size/2} cy={size/2} r={r} fill="none" className="radial-track" strokeWidth={stroke} />
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="var(--accent-warm)" strokeWidth={stroke}
+        strokeDasharray={C} strokeDashoffset={C - (value/100)*C}
+        strokeLinecap="round" transform={`rotate(-90 ${size/2} ${size/2})`} className="radial-fill" />
+      <text x={size/2} y={size/2+4} textAnchor="middle" fontSize="14" fontFamily="var(--ff-mono)" fontWeight="500">{value}</text>
+    </svg>
+  );
+}
+
+// ---- Vehicle → Pack topology ----------------------------------------------
+function PackTopology({ items, projects }) {
+  const [activePack, setActivePack] = useState(0);
+  const COLORS = ["#c97a4a", "#1d3a5f", "#5a6271"];
+
+  // Build vehicle list from items; ensure unique; map vehicle -> pack indices
+  const vehicleMap = {};
+  items.forEach((p, pi) => p.models.forEach(m => {
+    if (!vehicleMap[m]) vehicleMap[m] = [];
+    vehicleMap[m].push(pi);
+  }));
+  const vehicles = Object.keys(vehicleMap);
+
+  const W = 1200, H = 540;
+  const leftX = 220, rightX = W - 220;
+  const vehY = (i) => 60 + (i * (H - 120)) / Math.max(1, vehicles.length - 1);
+  const packY = (i) => 100 + i * 170;
+
+  return (
+    <Reveal>
+      <div className="card" style={{padding: 32}}>
+        <ExportButton filename="vehicle-pack-topology" />
+        <DataExportButton filename="pack-topology" sheets={{ Packs: items.map(p=>({ Pack:p.pack, Synergy:p.synergy, Save:p.save, Models:p.models.join(", ") })) }} />
+        <div style={{display:"flex", justifyContent:"space-between", alignItems:"start", marginBottom: 24}}>
+          <div>
+            <div className="caption mono">VEHICLE → PACK · TOPOLOGY</div>
+            <div className="h3 cn" style={{marginTop: 6}}>整车 ↔ 标准 Pack 映射拓扑</div>
+          </div>
+          <div className="caption mono" style={{color:"var(--accent-warm)"}}>HOVER A PACK · LIGHT UP CANDIDATES</div>
+        </div>
+
+        <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={H} style={{background:"var(--bg-2)", borderRadius: 12}}>
+          {/* Connection lines */}
+          {vehicles.map((v, vi) =>
+            vehicleMap[v].map((pi, k) => {
+              const isActive = activePack === pi;
+              const x1 = leftX, y1 = vehY(vi);
+              const x2 = rightX - 100, y2 = packY(pi) + 50;
+              const cx = (x1 + x2) / 2;
+              const d = `M${x1} ${y1} C${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`;
+              return (
+                <path key={v+"-"+pi+"-"+k} d={d}
+                  fill="none"
+                  stroke={isActive ? COLORS[pi] : "var(--ink-4)"}
+                  strokeWidth={isActive ? 1.6 : 0.8}
+                  opacity={isActive ? 0.9 : 0.18}
+                  style={{transition: "all .35s ease"}} />
+              );
+            })
+          )}
+
+          {/* Vehicle nodes */}
+          {vehicles.map((v, vi) => {
+            const lit = vehicleMap[v].includes(activePack);
+            return (
+              <g key={v} style={{cursor:"pointer", transition:"all .3s"}}>
+                <circle cx={leftX} cy={vehY(vi)} r={lit?5:3.5} fill={lit?COLORS[activePack]:"var(--ink-3)"}>
+                  {lit && <animate attributeName="r" from="3.5" to="6" dur="1s" repeatCount="indefinite" begin="0s"/>}
+                </circle>
+                <text x={leftX - 14} y={vehY(vi) + 4} textAnchor="end" fontSize="11"
+                  fontFamily="var(--ff-mono)"
+                  fill={lit ? "var(--ink)" : "var(--ink-3)"}
+                  fontWeight={lit ? 600 : 400}
+                  style={{transition:"all .3s"}}>{v}</text>
+              </g>
+            );
+          })}
+
+          {/* Pack nodes */}
+          {items.map((p, pi) => (
+            <g key={p.pack} onMouseEnter={()=>setActivePack(pi)} style={{cursor:"pointer"}}>
+              <rect x={rightX - 100} y={packY(pi) + 18} width={180} height={64}
+                rx={10}
+                fill={activePack===pi ? COLORS[pi] : "var(--bg-3)"}
+                stroke={activePack===pi ? COLORS[pi] : "var(--line)"}
+                strokeWidth="1"
+                style={{transition:"all .35s"}}/>
+              <text x={rightX - 86} y={packY(pi) + 42} fontSize="12" fontWeight="600"
+                fill={activePack===pi?"white":"var(--ink)"} fontFamily="var(--ff-disp)">STD-PACK S{pi+1}</text>
+              <text x={rightX - 86} y={packY(pi) + 60} fontSize="10"
+                fill={activePack===pi?"rgba(255,255,255,.8)":"var(--ink-3)"}
+                fontFamily="var(--ff-mono)">{p.pack.match(/\(([^)]+)\)/)?.[1] || ""}</text>
+              <text x={rightX - 86} y={packY(pi) + 76} fontSize="10"
+                fill={activePack===pi?"rgba(255,255,255,.7)":"var(--ink-4)"}
+                fontFamily="var(--ff-mono)">{p.models.length} candidates · {p.synergy}% synergy</text>
+            </g>
+          ))}
+
+          {/* Column labels */}
+          <text x={leftX} y={32} textAnchor="end" fontSize="10" fill="var(--ink-3)" fontFamily="var(--ff-mono)">VEHICLE PROJECTS ←</text>
+          <text x={rightX - 10} y={32} fontSize="10" fill="var(--ink-3)" fontFamily="var(--ff-mono)">→ STANDARD PACKS</text>
+        </svg>
+
+        <div className="cn caption" style={{marginTop:16, lineHeight:1.6, color:"var(--ink-3)"}}>
+          <strong style={{color:"var(--ink)"}}>挖掘共性，开发标准 Pack —</strong> 通过整车项目向 Pack 的多对多映射，识别可横向展开的大单品候选。Hover 任一 Pack 节点查看候选车型联动高亮。
+        </div>
+      </div>
+    </Reveal>
+  );
+}
+
+Object.assign(window, { RDSection });
+
+</script>
+<!-- =============================================================
+  组件 03 — 痛点机会点 PainSection
+============================================================= -->
+<script type="text/babel">
+// Page 3 — 痛点机会点 (Pain & Opportunity)
+
+function PainSection() {
+  const data = window.PAIN_DATA;
+  const [activeModel, setActiveModel] = useState(null);
+  const segNarratives = [
+    "A0/A00 城市电动车，用户最痛的是续航虚标与冬季掉电；机会点在热泵标配 + 50kW+ 直流快充。",
+    "B 级紧凑车，痛点集中在高速能耗 / 热泵缺失 / 软件流畅度，CATL 神行 Pro 极寒补能特性正中需求。",
+    "C 级中型车，800V 快充覆盖率与 ADAS 稳定性是分水岭，残值预期影响购车决策。",
+    "D 级豪华车，软件Bug + 实体按键缺失成最大流失因素，残值率快速下跌警示。",
+  ];
+  return (
+    <section id="pain" data-screen-label="03 痛点机会点" style={{background:"var(--bg)"}}>
+      <div className="container">
+        <Reveal><div className="section-tag mono">03 / 痛点 & 机会点 · VOICE OF CUSTOMER</div></Reveal>
+        <Reveal delay={80}>
+          <h2 className="h1 disp" style={{maxWidth: 1100, marginBottom: 24}}>
+            What drivers <em style={{color:"var(--accent-warm)", fontStyle:"italic"}}>actually</em><br/>complain about.
+          </h2>
+        </Reveal>
+        <Reveal delay={140}>
+          <p className="body-lg cn" style={{maxWidth: 740, marginBottom: 56}}>
+            爬虫国外汽车论坛 (Reddit / SpeakEV / VWIDtalk / BriskOda 等) 抓取超 <strong>1,950</strong> 条有效声音，按级别 + 车型双视角聚合，揭示真实痛点与机会点。
+          </p>
+        </Reveal>
+
+        {/* All Segments grid — 4 levels visible at once */}
+        <Reveal>
+          <div style={{marginBottom:24}}>
+            <div className="caption mono" style={{color:"var(--accent-warm)"}}>LEVEL 1 · ALL SEGMENTS</div>
+            <h3 className="h2 disp" style={{marginTop:6}}>分级别 · 共性吐槽 + 机会点</h3>
+          </div>
+        </Reveal>
+        <div style={{display:"grid", gridTemplateColumns:"repeat(2, 1fr)", gap:16, marginBottom:32}}>
+          {data.segments.map((s, idx) => (
+            <Reveal key={s.seg} delay={idx*60}>
+              <div className="card" style={{padding:28, height:"100%"}}>
+                <ExportButton filename={`pain-${s.seg.replace(/\s+/g,"-")}`} />
+                <DataExportButton filename={`pain-${s.seg.replace(/\s+/g,"-")}`} sheets={{ Pain: s.top.map(p=>({ Pain:p.pt, Weight_pct:p.weight, Sentiment:p.sentiment, Voices:p.voices })), Opportunities: s.opp.map(o=>({ Opportunity:o })) }} />
+                <div style={{display:"flex", justifyContent:"space-between", alignItems:"start", marginBottom:18}}>
+                  <div>
+                    <div className="caption mono" style={{color:"var(--accent-warm)"}}>SEGMENT {s.seg.split(" ")[0]}</div>
+                    <div className="h3 disp" style={{marginTop:4}}>{s.seg}</div>
+                  </div>
+                  <div style={{textAlign:"right"}}>
+                    <div className="disp" style={{fontSize:34, fontWeight:500, lineHeight:1}}>
+                      <Counter to={s.count}/>
+                    </div>
+                    <div className="mono caption" style={{marginTop:4}}>VOICES</div>
+                  </div>
+                </div>
+                <div className="cn caption" style={{fontSize:12.5, lineHeight:1.55, color:"var(--ink-3)", marginBottom:18, paddingBottom:14, borderBottom:"1px solid var(--line-2)"}}>
+                  {segNarratives[idx]}
+                </div>
+                <div className="caption mono" style={{marginBottom:8}}>TOP 5 PAIN POINTS</div>
+                {s.top.map((p, i) => (
+                  <div key={p.pt} className="bar-row" style={{gridTemplateColumns:"1fr 110px 50px", padding:"8px 0", animation:`slideIn .6s ${i*60}ms cubic-bezier(.2,.8,.2,1) backwards`}}>
+                    <div className="cn" style={{fontSize:12.5}}>{p.pt}</div>
+                    <div className="bar-track" style={{height:6}}>
+                      <div className="bar-fill" style={{
+                        width:`${p.weight*2.5}%`,
+                        background: p.sentiment < -0.6 ? "linear-gradient(90deg, #b04a3a, #d97560)" : "linear-gradient(90deg, #b8845a, #d4a474)"
+                      }}></div>
+                    </div>
+                    <div className="mono caption" style={{textAlign:"right", fontSize:10.5}}>{p.voices}</div>
+                  </div>
+                ))}
+                <div style={{marginTop:14, paddingTop:14, borderTop:"1px solid var(--line-2)"}}>
+                  <div className="caption mono" style={{color:"var(--good)", marginBottom:8}}>+ OPPORTUNITY · 机会点</div>
+                  <div style={{display:"flex", gap:6, flexWrap:"wrap"}}>
+                    {s.opp.map(o => <span key={o} className="chip" style={{fontSize:10.5, padding:"4px 9px"}}>{o}</span>)}
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+
+        {/* Hot model voice cards */}
+        <Reveal>
+          <div style={{display:"flex", alignItems:"center", gap:18, margin:"60px 0 24px"}}>
+            <div style={{flex:1, height:1, background:"var(--line-2)"}}></div>
+            <span className="mono caption" style={{color:"var(--accent-warm)"}}>↓ DRILL INTO {data.models.length} HOT MODELS · LEVEL 2</span>
+            <div style={{flex:1, height:1, background:"var(--line-2)"}}></div>
+          </div>
+          <div style={{marginBottom: 24}}>
+            <div className="caption mono" style={{marginBottom: 6}}>LEVEL 2 · BY HOT MODEL</div>
+            <h3 className="h2 disp">Drivers, in their own words.</h3>
+            <div className="caption" style={{marginTop: 8}}>Click any card · 查看雷达图与完整明细</div>
+          </div>
+        </Reveal>
+
+        <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap: 16}}>
+          {data.models.map((m, i) => (
+            <Reveal key={m.model} delay={i*60}>
+              <div data-cursor onClick={()=>setActiveModel(m)} style={{cursor:"pointer"}}>
+                <ModelVoiceCard m={m} />
+              </div>
+            </Reveal>
+          ))}
+        </div>
+
+        {activeModel && <ModelDetailModal m={activeModel} onClose={()=>setActiveModel(null)} />}
+      </div>
+    </section>
+  );
+}
+
+function ModelDetailModal({ m, onClose }) {
+  const all = [...m.cons.map(t=>({t,k:"con"})), ...m.pros.map(t=>({t,k:"pro"}))];
+  const N = all.length, radius = 110;
+  return (
+    <div onClick={onClose} style={{position:"fixed", inset:0, background:"rgba(20,23,28,0.55)", backdropFilter:"blur(8px)", zIndex:400, display:"flex", alignItems:"center", justifyContent:"center", padding:32}}>
+      <div onClick={e=>e.stopPropagation()} className="card" style={{padding:36, maxWidth:880, width:"100%", maxHeight:"86vh", overflowY:"auto"}}>
+        <div style={{display:"flex", justifyContent:"space-between", alignItems:"start", marginBottom:20}}>
+          <div>
+            <div className="caption mono">{m.brand.toUpperCase()} · LEVEL 2 DETAIL</div>
+            <div className="disp" style={{fontSize:36, fontWeight:500, marginTop:4}}>{m.model}</div>
+            <div className="mono caption" style={{marginTop:6}}>2025 EU · {fmt.comma(m.units)} units</div>
+          </div>
+          <span data-cursor onClick={onClose} className="chip mono" style={{cursor:"pointer"}}>CLOSE ✕</span>
+        </div>
+        <div style={{display:"grid", gridTemplateColumns:"1fr 1.2fr", gap:32, marginTop:14}}>
+          <div>
+            <div className="caption mono" style={{marginBottom:10}}>VOICE RADAR · PROS / CONS</div>
+            <svg viewBox="-160 -160 320 320" width="100%" style={{aspectRatio:"1"}}>
+              {[0.33,0.66,1].map(s => <circle key={s} r={radius*s} cx={0} cy={0} fill="none" stroke="var(--line-2)" strokeDasharray="2 3"/>)}
+              {all.map((it,i)=>{const a=(i/N)*Math.PI*2-Math.PI/2; return <line key={i} x1={0} y1={0} x2={Math.cos(a)*radius} y2={Math.sin(a)*radius} stroke="var(--line-2)"/>;})}
+              <polygon points={all.map((it,i)=>{const a=(i/N)*Math.PI*2-Math.PI/2; const r=(it.k==="pro"?0.85:0.6)*radius; return Math.cos(a)*r+","+Math.sin(a)*r;}).join(" ")} fill="rgba(201,122,74,0.18)" stroke="#c97a4a" strokeWidth="1.5"/>
+              {all.map((it,i)=>{const a=(i/N)*Math.PI*2-Math.PI/2; const r=(it.k==="pro"?0.85:0.6)*radius; return <circle key={i} cx={Math.cos(a)*r} cy={Math.sin(a)*r} r={3.5} fill={it.k==="pro"?"#2f7d5b":"#b04a3a"}/>;})}
+            </svg>
+          </div>
+          <div>
+            <div className="caption mono" style={{marginBottom:10}}>VOICE BREAKDOWN</div>
+            <blockquote style={{margin:0, padding:"14px 16px", background:"var(--bg-2)", borderLeft:"2px solid var(--accent-warm)", fontSize:13, lineHeight:1.55, fontStyle:"italic", color:"var(--ink-2)", borderRadius:"0 8px 8px 0", marginBottom:18}}>
+              {m.quote}
+              <div className="mono caption" style={{marginTop:8, fontStyle:"normal"}}>— {m.source}</div>
+            </blockquote>
+            <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:18}}>
+              <div>
+                <div className="caption mono" style={{color:"var(--good)", marginBottom:8}}>+ PROS · 卖点</div>
+                {m.pros.map(t=><div key={t} className="cn" style={{fontSize:13, padding:"6px 0", borderBottom:"1px solid var(--line-2)"}}>{t}</div>)}
+              </div>
+              <div>
+                <div className="caption mono" style={{color:"var(--bad)", marginBottom:8}}>− CONS · 槽点</div>
+                {m.cons.map(t=><div key={t} className="cn" style={{fontSize:13, padding:"6px 0", borderBottom:"1px solid var(--line-2)"}}>{t}</div>)}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ModelVoiceCard({ m }) {
+  const [side, setSide] = useState("cons");
+  return (
+    <div className="card" style={{padding: 28, height:"100%", display:"flex", flexDirection:"column", minHeight: 460}}>
+      <div style={{display:"flex", justifyContent:"space-between", alignItems:"start", marginBottom: 18}}>
+        <div>
+          <div className="caption mono">{m.brand.toUpperCase()}</div>
+          <div className="h3 disp" style={{marginTop: 4}}>{m.model}</div>
+        </div>
+        <div style={{textAlign:"right"}}>
+          <div className="mono caption">2025 EU</div>
+          <div className="disp" style={{fontSize: 20, fontWeight: 500}}>{fmt.k(m.units)}</div>
+        </div>
+      </div>
+
+      <blockquote style={{
+        border:"none", margin: 0, padding: "16px 18px",
+        background: "var(--bg-2)", borderLeft: "2px solid var(--accent-warm)",
+        fontSize: 13, lineHeight: 1.55, fontStyle:"italic", color:"var(--ink-2)", borderRadius:"0 8px 8px 0",
+      }}>
+        {m.quote}
+        <div className="mono caption" style={{marginTop: 8, fontStyle:"normal"}}>— {m.source}</div>
+      </blockquote>
+
+      <div style={{display:"flex", gap: 4, padding: 4, background:"var(--bg-2)", borderRadius:999, width:"fit-content", marginTop: 18}}>
+        <div className={`tab mono ${side==="cons"?"active":""}`} style={{fontSize: 11}} onClick={()=>setSide("cons")}>痛点 ({m.cons.length})</div>
+        <div className={`tab mono ${side==="pros"?"active":""}`} style={{fontSize: 11}} onClick={()=>setSide("pros")}>卖点 ({m.pros.length})</div>
+      </div>
+
+      <ul style={{margin:"14px 0 0 0", padding:0, listStyle:"none"}}>
+        {(side==="cons"?m.cons:m.pros).map((x,j) => (
+          <li key={x} className="cn" style={{
+            fontSize: 13, padding:"8px 0",
+            borderBottom: "1px solid var(--line-2)",
+            display:"flex", gap: 10, alignItems:"start",
+          }}>
+            <span className="mono caption" style={{color: side==="cons"?"var(--bad)":"var(--good)", marginTop: 2, fontSize: 10}}>
+              {side==="cons"?"−":"+"}
+            </span>
+            <span>{x}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+Object.assign(window, { PainSection });
+
+</script>
+<!-- =============================================================
+  组件 04 — 竞争态势 CompeteSection
+============================================================= -->
+<script type="text/babel">
+// Page 4 — 竞争态势 (Competitive landscape)
+
+function CompeteSection() {
+  const data = window.COMPETE_DATA;
+  return (
+    <section id="compete" data-screen-label="04 竞争态势" style={{ background: "var(--bg-2)" }}>
+      <div className="container">
+        <Reveal><div className="section-tag mono">04 / 竞争态势 · COMPETITIVE</div></Reveal>
+        <Reveal delay={80}>
+          <h2 className="h1 disp" style={{ maxWidth: 1100, marginBottom: 24 }}>
+            CATL holds the throne.<br />
+            <em style={{ color: "var(--accent-warm)", fontStyle: "italic" }}>Who's coming?</em>
+          </h2>
+        </Reveal>
+        <Reveal delay={140}>
+          <p className="body-lg cn" style={{ maxWidth: 740, marginBottom: 56 }}>
+            Jan-Feb 2026 全球动力电池装机数据：CATL 42.1% 仍稳居首位，但 BYD 加速、韩系收缩、日系反扑、欧洲本地化 — 四股力量同时作用。
+          </p>
+        </Reveal>
+
+        <BatteryRanking battery={data.battery} />
+
+        <div style={{ height: 80 }}></div>
+
+        <CompetitorMoves moves={data.moves} />
+      </div>
+    </section>);
+
+}
+
+function BatteryRanking({ battery }) {
+  const max = Math.max(...battery.map((b) => b.share));
+  return (
+    <div className="card" style={{ padding: 32 }}>
+      <ExportButton filename="battery-share" />
+      <DataExportButton filename="battery-share" sheets={{ Battery: battery.map(b=>({ Maker:b.name, Country:b.country, Share_pct:b.share, GWh:b.gwh, YoY_pct:b.yoy })) }} />
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", marginBottom: 24 }}>
+        <div>
+          <div className="caption mono">GLOBAL EV BATTERY · JAN–FEB 2026</div>
+          <div className="h3 cn" style={{ marginTop: 6 }}>动力电池阵营对比 — CATL 友商动态</div>
+        </div>
+        <div className="caption mono">SOURCE: SNE RESEARCH</div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "200px 1fr 60px 100px 110px", gap: 18, paddingBottom: 12, borderBottom: "1px solid var(--line-2)" }}>
+        <div className="caption mono">SUPPLIER</div>
+        <div className="caption mono">SHARE</div>
+        <div className="caption mono">REGION</div>
+        <div className="caption mono" style={{ textAlign: "right" }}>YOY</div>
+        <div className="caption mono" style={{ textAlign: "right" }}>TREND</div>
+      </div>
+
+      {battery.map((b, i) =>
+      <div key={b.name}
+      style={{
+        display: "grid", gridTemplateColumns: "200px 1fr 60px 100px 110px", gap: 18,
+        padding: "16px 0", borderBottom: "1px solid var(--line-2)", alignItems: "center",
+        background: b.name === "CATL" ? "linear-gradient(90deg, rgba(201,122,74,0.06), transparent)" : "transparent",
+        animation: `slideIn .6s ${i * 60}ms cubic-bezier(.2,.8,.2,1) backwards`
+      }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span className="mono caption" style={{ width: 22, color: "var(--ink-4)" }}>#{i + 1}</span>
+            <div>
+              <div className="cn" style={{ fontSize: 14, fontWeight: b.name === "CATL" ? 600 : 500 }}>{b.name}</div>
+              <div className="mono caption" style={{ fontSize: 10 }}>{b.gwh} GWh</div>
+            </div>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div className="bar-track" style={{ flex: 1, height: 12 }}>
+              <div className="bar-fill" style={{
+              width: `${b.share / max * 100}%`,
+              background: b.name === "CATL" ? "linear-gradient(90deg, var(--accent-warm), #b8845a)" : "var(--ink-2)"
+            }}></div>
+            </div>
+            <span className="mono" style={{ fontSize: 13, fontWeight: 500, width: 50 }}>{b.share}%</span>
+          </div>
+          <div className="mono caption">{b.country}</div>
+          <div className="mono caption" style={{ textAlign: "right", color: b.yoy >= 0 ? "var(--good)" : "var(--bad)" }}>{fmt.pct(b.yoy, 1)}</div>
+          <div style={{ textAlign: "right" }}>
+            <Sparkline values={b.trend} w={100} h={28} color={b.name === "CATL" ? "var(--accent-warm)" : "var(--ink-3)"} fill />
+          </div>
+        </div>
+      )}
+    </div>);
+
+}
+
+function CompetitorMoves({ moves }) {
+  return (
+    <Reveal>
+      <div>
+        <div className="caption mono" style={{ marginBottom: 6 }}>CATL ECOSYSTEM · COMPETITOR INTEL</div>
+        <h2 className="h2 disp" style={{ marginBottom: 24 }}>Movements on the chessboard.</h2>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16 }}>
+          {moves.map((m, i) =>
+          <div key={i} className="card" style={{ padding: 26, display: "flex", gap: 18, alignItems: "start" }}>
+              <div style={{ flexShrink: 0, width: 90 }}>
+                <div className="mono caption" style={{ fontSize: 10, color: "var(--accent-warm)", fontWeight: 500 }}>{m.date}</div>
+                <div className="disp" style={{ fontSize: 18, fontWeight: 500, marginTop: 4 }}>{m.co}</div>
+              </div>
+              <div style={{ flex: 1, paddingLeft: 18, borderLeft: "1px solid var(--line-2)" }}>
+                <div className="cn" style={{ fontSize: 14, fontWeight: 500, marginBottom: 8 }}>{m.title}</div>
+                <div className="cn caption" style={{ lineHeight: 1.55, fontSize: 12.5, color: "var(--ink-3)" }}>{m.body}</div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </Reveal>);
+
+}
+
+function FooterBlock() {
+  return (
+    <footer>
+      <div className="container">
+        <div className="footer-grid">
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
+              <div className="nav-dot" style={{ background: "var(--bg)" }}></div>
+              <span className="disp" style={{ fontSize: 18, fontWeight: 600 }}>SC-EC </span>
+            </div>
+            <p className="cn" style={{ maxWidth: 380, fontSize: 14, lineHeight: 1.6, color: "#9aa2b1" }}>一个面向海外SC团队的实时洞察平台。融合销量、研发管线、用户声音与竞争情报，为下一波电动化决策提供数据底座。
+
+            </p>
+          </div>
+          <FooterCol title="Modules" items={["市场销量分析", "在研项目对标", "用户声音聚合", "竞争态势监测"]} />
+          <FooterCol title="Data Sources" items={["EV Volumes / JATO", "SNE Research", "ACEA · 欧盟统计", "Reddit · SpeakEV", "DEP 内部销量"]} />
+          <FooterCol title="Stack" items={["React 18", "Tailwind / CSS", "Framer Motion", "SVG / Canvas"]} />
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 32, color: "#9aa2b1" }}>
+          <span className="mono caption">© 2026 · EV INTELLIGENCE PLATFORM · DEMO BUILD</span>
+          <span className="mono caption">v2026.05 · Last sync 2 min ago</span>
+        </div>
+      </div>
+    </footer>);
+
+}
+
+function FooterCol({ title, items }) {
+  return (
+    <div>
+      <div className="caption mono" style={{ color: "#9aa2b1", marginBottom: 16 }}>{title.toUpperCase()}</div>
+      <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
+        {items.map((i) => <li key={i} className="cn" style={{ padding: "6px 0", fontSize: 13, color: "var(--bg)" }}>{i}</li>)}
+      </ul>
+    </div>);
+
+}
+
+Object.assign(window, { CompeteSection, FooterBlock });
+</script>
+
+<!-- =============================================================
+  组件 05 — A0/A00 小车专题 A0Section
+============================================================= -->
+<script type="text/babel">
+// Page 5 — A0/A00 小车专题 (Small EV Deep Dive)
+
+function A0Section() {
+  const data = window.A0_SEGMENT_DATA;
+  return (
+    <section id="a0" data-screen-label="05 A0/A00小车专题" style={{background:"var(--bg)"}}>
+      <div className="container">
+        <Reveal><div className="section-tag mono">05 / A0/A00 小车专题 · SMALL EV DEEP DIVE</div></Reveal>
+        <Reveal delay={80}>
+          <h2 className="h1 disp" style={{maxWidth: 1100, marginBottom: 24}}>
+            The <em style={{color:"var(--accent-warm)", fontStyle:"italic"}}>€20k barrier</em><br/>is finally breaking.
+          </h2>
+        </Reveal>
+        <Reveal delay={140}>
+          <p className="body-lg cn" style={{maxWidth: 780, marginBottom: 56}}>
+            2025–2027 年，欧洲 A 段 (A00) 与 B 段 (A0) 迎来有史以来最密集的新车浪潮 —
+            <strong>13+ 款</strong>纯电小车集中上市，将 BEV 起售价压至 €17k–€25k 区间，
+            B 段均价同比下跌 <strong>13% (€4,600)</strong>。这是电动化真正触达大众市场的转折点。
+          </p>
+        </Reveal>
+
+        {/* KPI Strip */}
+        <Reveal delay={180}>
+          <div className="kpi-strip" style={{marginBottom:56}}>
+            <div className="stat">
+              <div className="stat-num"><Counter to={data.marketKPI.sub25kShare} suffix="%"/></div>
+              <div className="stat-lbl">{'<'}€25K BEV 占比 (2025)</div>
+            </div>
+            <div className="stat">
+              <div className="stat-num"><Counter to={Math.abs(data.marketKPI.bSegPriceDrop2025)} prefix="-" suffix="%"/></div>
+              <div className="stat-lbl">B段均价同比降幅</div>
+            </div>
+            <div className="stat">
+              <div className="stat-num"><Counter to={13} suffix="+"/></div>
+              <div className="stat-lbl">A/B段新车管线</div>
+            </div>
+            <div className="stat">
+              <div className="stat-num">€<Counter to={17} suffix="k"/></div>
+              <div className="stat-lbl">最低起售价 (ID.EVERY1)</div>
+            </div>
+          </div>
+        </Reveal>
+
+        {/* ── 在售车型对比表 ────────────────────────────────── */}
+        <Reveal>
+          <OnSaleComparison vehicles={data.onSale} />
+        </Reveal>
+
+        <div style={{height:80}}></div>
+
+        {/* ── 即将上市车型 ──────────────────────────────────── */}
+        <Reveal>
+          <UpcomingA0Vehicles vehicles={data.upcoming} />
+        </Reveal>
+
+        <div style={{height:80}}></div>
+
+        {/* ── 补贴政策对比 ──────────────────────────────────── */}
+        <Reveal>
+          <SubsidyComparison subsidies={data.subsidies} />
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+// ── 在售车型对比 ─────────────────────────────────────────────
+function OnSaleComparison({ vehicles }) {
+  const [activeSeg, setActiveSeg] = useState("ALL");
+  const filtered = activeSeg === "ALL" ? vehicles : vehicles.filter(v => v.seg === activeSeg);
+  const segs = ["ALL", ...new Set(vehicles.map(v => v.seg))];
+
+  return (
+    <div>
+      <div style={{display:"flex", justifyContent:"space-between", alignItems:"start", marginBottom:24, flexWrap:"wrap", gap:12}}>
+        <div>
+          <div className="caption mono" style={{color:"var(--accent-warm)"}}>ON SALE · 在售车型全参数对比</div>
+          <h3 className="h2 disp" style={{marginTop:6}}>8 台在售小型 EV，谁是真王者？</h3>
+          <div className="caption" style={{marginTop:6}}>价格 · 电池 · 续航 · 快充 · 产地 · 补贴资格 一目了然</div>
+        </div>
+        <div className="tabs" data-no-smooth>
+          {segs.map(s => (
+            <div key={s} className={`tab mono ${activeSeg===s?"active":""}`} onClick={()=>setActiveSeg(s)} style={{fontSize:12}}>
+              {s === "ALL" ? "ALL" : `SEG ${s}`}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{overflowX:"auto", borderRadius:14, border:"1px solid var(--line-2)"}}>
+        <table style={{width:"100%", borderCollapse:"collapse", fontSize:12.5, minWidth:1200}}>
+          <thead>
+            <tr style={{background:"var(--bg-2)"}}>
+              {["车型","级别","起售价","电池","化学体系","WLTP续航","电机功率","DC快充","平台","产地","2025销量","亮点"].map(h => (
+                <th key={h} style={{padding:"12px 10px", textAlign:"left", borderBottom:"1px solid var(--line-2)", whiteSpace:"nowrap", position:"sticky", top:0, zIndex:2, background:"var(--bg-2)"}}>
+                  <span className="mono caption" style={{fontWeight:600}}>{h}</span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map((v, i) => (
+              <tr key={v.model} style={{borderBottom:"1px solid var(--line-2)", animation:`slideIn .5s ${i*50}ms cubic-bezier(.2,.8,.2,1) backwards`}}>
+                <td style={{padding:"12px 10px", fontWeight:600, whiteSpace:"nowrap"}}>
+                  <div className="cn" style={{fontSize:13}}>{v.model}</div>
+                  <div className="mono caption" style={{fontSize:10, color:"var(--ink-4)"}}>{v.oem}</div>
+                </td>
+                <td style={{padding:"12px 8px"}}><span className="chip mono" style={{fontSize:10, padding:"2px 8px"}}>{v.seg}</span></td>
+                <td style={{padding:"12px 8px", fontFamily:"var(--ff-mono)", fontWeight:600, color:"var(--accent-warm)"}}>{v.price}</td>
+                <td style={{padding:"12px 8px", fontFamily:"var(--ff-mono)", fontSize:12}}>{v.battery}</td>
+                <td style={{padding:"12px 8px"}}><span className="mono" style={{fontSize:11}}>{v.chem}</span></td>
+                <td style={{padding:"12px 8px", fontFamily:"var(--ff-mono)", fontWeight:500}}>{v.range} km</td>
+                <td style={{padding:"12px 8px", fontFamily:"var(--ff-mono)", fontSize:12}}>{v.motor}</td>
+                <td style={{padding:"12px 8px", fontFamily:"var(--ff-mono)", fontSize:12}}>{v.dc}</td>
+                <td style={{padding:"12px 8px"}}><span className="mono caption" style={{fontSize:10}}>{v.platform}</span></td>
+                <td style={{padding:"12px 8px", fontSize:12}}>{v.made}</td>
+                <td style={{padding:"12px 8px", fontFamily:"var(--ff-mono)", fontWeight:500}}>{v.sales2025 ? fmt.comma(v.sales2025) : "—"}</td>
+                <td style={{padding:"12px 8px", maxWidth:200}}>
+                  <div className="cn caption" style={{fontSize:11, lineHeight:1.4}}>{v.note}</div>
+                  {v.award && <span className="chip" style={{fontSize:9, padding:"2px 6px", marginTop:4, background:"var(--good)", color:"white", border:"none"}}>🏆 {v.award}</span>}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ── 即将上市车型卡片 ─────────────────────────────────────────
+function UpcomingA0Vehicles({ vehicles }) {
+  return (
+    <div>
+      <div className="caption mono" style={{color:"var(--accent-warm)", marginBottom:6}}>UPCOMING · 即将上市 / 在研车型</div>
+      <h3 className="h2 disp" style={{marginBottom:8}}>6 new A0/A00 EVs arriving 2026–2027.</h3>
+      <p className="body cn" style={{maxWidth:720, marginBottom:32, color:"var(--ink-3)"}}>
+        从 €17k 的 VW ID.EVERY1 到 226hp 的 Cupra Raval VZ，覆盖城市通勤到运动驾驶全场景。
+      </p>
+
+      <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:16}}>
+        {vehicles.map((v, i) => (
+          <Reveal key={v.model} delay={i*60}>
+            <div className="card" style={{padding:28, height:"100%", display:"flex", flexDirection:"column"}}>
+              <div style={{display:"flex", justifyContent:"space-between", alignItems:"start", marginBottom:14}}>
+                <div>
+                  <div className="caption mono" style={{color:"var(--accent-warm)"}}>{v.oem} · SEG {v.seg}</div>
+                  <div className="h3 disp" style={{marginTop:4, fontSize:20}}>{v.model}</div>
+                </div>
+                <span className="chip mono" style={{fontSize:10, padding:"3px 10px",
+                  background: v.status.includes("Launched") ? "var(--good)" : v.status.includes("Pre-prod") ? "#1d3a5f" : "var(--ink-4)",
+                  color:"white", border:"none"
+                }}>{v.sop}</span>
+              </div>
+
+              <div style={{background:"var(--bg-2)", borderRadius:10, padding:16, marginBottom:14}}>
+                <div className="disp" style={{fontSize:28, fontWeight:500, color:"var(--accent-warm)", marginBottom:4}}>{v.price}</div>
+                <div className="caption">起售价 (补贴前)</div>
+              </div>
+
+              <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:14}}>
+                <div style={{padding:"8px 0", borderBottom:"1px solid var(--line-2)"}}>
+                  <div className="caption">电池</div>
+                  <div className="mono" style={{fontSize:13, fontWeight:500, marginTop:2}}>{v.battery}</div>
+                </div>
+                <div style={{padding:"8px 0", borderBottom:"1px solid var(--line-2)"}}>
+                  <div className="caption">化学</div>
+                  <div className="mono" style={{fontSize:13, fontWeight:500, marginTop:2}}>{v.chem}</div>
+                </div>
+                <div style={{padding:"8px 0", borderBottom:"1px solid var(--line-2)"}}>
+                  <div className="caption">WLTP续航</div>
+                  <div className="mono" style={{fontSize:13, fontWeight:500, marginTop:2}}>{v.range} km</div>
+                </div>
+                <div style={{padding:"8px 0", borderBottom:"1px solid var(--line-2)"}}>
+                  <div className="caption">DC快充</div>
+                  <div className="mono" style={{fontSize:13, fontWeight:500, marginTop:2}}>{v.dc}</div>
+                </div>
+                <div style={{padding:"8px 0", borderBottom:"1px solid var(--line-2)"}}>
+                  <div className="caption">电机</div>
+                  <div className="mono" style={{fontSize:13, fontWeight:500, marginTop:2}}>{v.motor}</div>
+                </div>
+                <div style={{padding:"8px 0", borderBottom:"1px solid var(--line-2)"}}>
+                  <div className="caption">平台</div>
+                  <div className="mono" style={{fontSize:13, fontWeight:500, marginTop:2}}>{v.platform}</div>
+                </div>
+              </div>
+
+              <div style={{padding:"8px 0", marginBottom:8}}>
+                <div className="caption">产地</div>
+                <div style={{fontSize:13, marginTop:2}}>{v.made}</div>
+              </div>
+
+              {v.subsidy && (
+                <div style={{background:"rgba(47,125,91,0.08)", borderRadius:8, padding:"10px 12px", marginBottom:8}}>
+                  <div className="mono caption" style={{color:"var(--good)", fontSize:10, fontWeight:600}}>💰 补贴</div>
+                  <div className="cn" style={{fontSize:12, marginTop:4, lineHeight:1.4}}>{v.subsidy}</div>
+                </div>
+              )}
+
+              <div className="cn caption" style={{fontSize:12, lineHeight:1.5, color:"var(--ink-3)", marginTop:"auto", paddingTop:10, borderTop:"1px solid var(--line-2)"}}>
+                <strong style={{color:"var(--ink)"}}>KEY · </strong>{v.highlight}
+              </div>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── 补贴政策对比 ─────────────────────────────────────────────
+function SubsidyComparison({ subsidies }) {
+  return (
+    <div>
+      <div className="caption mono" style={{color:"var(--accent-warm)", marginBottom:6}}>POLICY · 补贴政策全景</div>
+      <h3 className="h2 disp" style={{marginBottom:8}}>Subsidies are reshaping the market.</h3>
+      <p className="body cn" style={{maxWidth:720, marginBottom:32, color:"var(--ink-3)"}}>
+        法国 CEE / 德国重启补贴 / 意大利 €11k Ecobonus / 欧盟70%本地化门槛 — 四大政策同时作用，
+        深刻影响 A0/A00 车型的竞争格局与供应链选择。
+      </p>
+
+      <div style={{display:"grid", gap:16}}>
+        {subsidies.map((s, i) => (
+          <div key={s.country} className="card" style={{padding:28, animation:`slideIn .5s ${i*80}ms cubic-bezier(.2,.8,.2,1) backwards`}}>
+            <div style={{display:"grid", gridTemplateColumns:"180px 1fr 1fr 1fr 1fr", gap:20, alignItems:"start"}}>
+              <div>
+                <div className="disp" style={{fontSize:22, fontWeight:500}}>{s.country}</div>
+                <div className="mono caption" style={{marginTop:4}}>{s.year}</div>
+              </div>
+              <div>
+                <div className="caption mono" style={{color:"var(--good)", marginBottom:4}}>购车补贴</div>
+                <div className="cn" style={{fontSize:12.5, lineHeight:1.5}}>{s.purchase}</div>
+              </div>
+              <div>
+                <div className="caption mono" style={{color:"var(--accent)", marginBottom:4}}>租赁 / 税收</div>
+                <div className="cn" style={{fontSize:12.5, lineHeight:1.5}}>{s.leasing}</div>
+                <div className="cn" style={{fontSize:11.5, lineHeight:1.5, marginTop:6, color:"var(--ink-3)"}}>{s.tax}</div>
+              </div>
+              <div>
+                <div className="caption mono" style={{color:"var(--bad)", marginBottom:4}}>关键门槛</div>
+                <div className="cn" style={{fontSize:12.5, lineHeight:1.5}}>{s.condition}</div>
+              </div>
+              <div>
+                <div className="caption mono" style={{marginBottom:4}}>市场影响</div>
+                <div className="cn" style={{fontSize:12.5, lineHeight:1.5, fontWeight:500}}>{s.impact}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Strategic callout */}
+      <div className="card" style={{padding:28, marginTop:20, background:"var(--ink)", color:"var(--bg)", border:"1px solid var(--ink)"}}>
+        <div style={{display:"grid", gridTemplateColumns:"2fr 1fr", gap:32, alignItems:"center"}}>
+          <div>
+            <div className="caption mono" style={{color:"#9aa2b1"}}>STRATEGIC INSIGHT · 对 CATL 的含义</div>
+            <div className="cn" style={{fontSize:15, marginTop:10, lineHeight:1.65}}>
+              欧盟拟推 <strong style={{color:"var(--accent-warm)"}}>70% 本地化制造</strong> 门槛获取补贴 — 这意味着仅靠中国出口电芯将越来越难享受终端补贴红利。
+              CATL 匈牙利 Debrecen 工厂 (100 GWh) 的落地时间表直接决定了在欧洲 A0/B 段小车市场中能否拿到
+              <strong> LFP 第一供应商</strong>的战略身位。当前 MEB+ 三兄弟 (Raval/ID.Polo/Epiq) 的 LFP 电芯供应已确认部分来自 CATL + PowerCo 联合供货体系。
+            </div>
+          </div>
+          <div style={{display:"grid", gap:16}}>
+            <div className="stat"><div className="stat-num" style={{color:"var(--bg)", fontSize:44}}>70%</div><div className="stat-lbl" style={{color:"#9aa2b1"}}>EU 本地化门槛(提案)</div></div>
+            <div className="stat"><div className="stat-num" style={{color:"var(--bg)", fontSize:44}}>100<span style={{fontSize:20}}>GWh</span></div><div className="stat-lbl" style={{color:"#9aa2b1"}}>CATL Debrecen 规划产能</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { A0Section });
+</script>
+<!-- =============================================================
+  组件入口 — App Root (ReactDOM.render)
+============================================================= -->
+<script type="text/babel">
+// Main app
+function App() {
+  useSmoothScroll();
+  return (
+    <div className="paper">
+      <Cursor />
+      <Nav />
+      <Hero />
+      <MarketSection />
+      <RDSection />
+      <PainSection />
+      <CompeteSection />
+      <A0Section />
+      <FooterBlock />
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("app"));
+root.render(<App />);
+
+</script>
+
+</body>
+</html>
