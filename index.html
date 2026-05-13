@@ -1737,7 +1737,7 @@ function BubbleChart({ bubbles, allBubbles }) {
       <DataExportButton filename="bubble-models" sheets={{ Models: visible.map(b=>({ Model:b.model, Brand:b.brand, Segment:b.seg, Power:b.power, Price_EUR_k:b.price, Battery_kWh:b.kwh, Sales_2025:b.sales })) }} />
       <div style={{display:"flex", justifyContent:"space-between", alignItems:"start", marginBottom: 20}}>
         <div>
-          <div className="h3 cn" style={{marginBottom: 6}}>价格 × 电量 × 销量 — 爆款规律解构</div>
+          <div className="h3 cn" style={{marginBottom: 6}}>欧洲总销量前十————价格 × 电量 × 销量 爆款规律解构</div>
           <div className="caption">X = MSRP € · Y = battery (kWh) · Bubble = 2025 sales · Color = powertrain</div>
         </div>
         <div style={{display:"flex", gap:14}}>
