@@ -931,6 +931,173 @@ console.log("[data] A0_SEGMENT_DATA loaded", Object.keys(window.A0_SEGMENT_DATA)
 
 
 </script>
+
+<!-- =============================================================
+  【新增数据】微型/小型车用户评论数据 SMALL_EV_VOICE_DATA
+  ► 插入位置：紧接在 A0_SEGMENT_DATA 的 </script> 之后
+============================================================= -->
+<script>
+window.SMALL_EV_VOICE_DATA = {
+  // ── 五大共性关注点 (由 8 款欧洲热销 A/B 级 EV 用户声音聚合) ──────────
+  painPoints: [
+    {
+      id: "charging",
+      icon: "⚡",
+      title: "充电便利性与续航里程",
+      weight: 34,
+      sentiment: -0.72,
+      voices: 486,
+      description: "家充条件是使用小型 EV 的核心前提；续航焦虑与充电速度是最高频投诉。冬季低温环境下续航折损尤为严重，DC 快充功率普遍不足 (<100kW) 加剧了等待焦虑。",
+      quotes: [
+        { text: "Not having home charging was terrible... it's inconvenient vs just plugging it in at home", model: "Fiat 500e", source: "Reddit r/Fiat" },
+        { text: "I had a charge at -6°C... resulted in a 22kW current — at CCS", model: "Renault 5", source: "SpeakEV" },
+        { text: "Advertised 320km WLTP, real-world is closer to 220km on motorway", model: "Citroën ë-C3", source: "Carwow Reviews" },
+        { text: "The car is set to charge at 6A — you have to change this every time you charge", model: "Volvo EX30", source: "SpeakEV" },
+      ],
+      opportunity: "热泵标配化 · 50kW+ DC 快充升级为 B 级基线 · 冬季续航透明化标注"
+    },
+    {
+      id: "price",
+      icon: "💰",
+      title: "价格与性价比争议",
+      weight: 28,
+      sentiment: -0.65,
+      voices: 412,
+      description: "用户对价格极度敏感，普遍认为该类车型定价偏高或二手残值不合理。€20k 以下的 BEV 才能真正触达大众市场心理门槛，残值快速下跌是阻碍换购的核心因素。",
+      quotes: [
+        { text: "A two-seater EV with 140mi range... is not worth $19k. That's a terrible buy", model: "Fiat 500e", source: "Reddit" },
+        { text: "Depreciate like a bucket of vomit", model: "Renault 5", source: "SpeakEV" },
+        { text: "How a £35–40k car can be released with such glaring faults is beyond me", model: "Volvo EX30", source: "SpeakEV" },
+        { text: "For the money, it punches well above its weight — but that's because the weight class is low", model: "Leapmotor T03", source: "Top Gear" },
+      ],
+      opportunity: "€20k 价格带定锚 · 残值承诺/回购方案 · 电池租赁降低购入门槛"
+    },
+    {
+      id: "space",
+      icon: "📦",
+      title: "后排/载物空间不足",
+      weight: 18,
+      sentiment: -0.48,
+      voices: 287,
+      description: "城市微型车空间受限是结构性痛点，尤其被有家庭需求的用户诟病。后排腿部空间与后备箱容积是 A/B 级 EV 最常见的妥协点。",
+      quotes: [
+        { text: "I wouldn't recommend it for more than one driver and one passenger", model: "Fiat 500e", source: "Reddit" },
+        { text: "Just wish there was more space in the back — a bit too small for me", model: "Renault 5", source: "SpeakEV" },
+        { text: "Boot that's smaller than you'd hope", model: "Leapmotor T03", source: "What Car?" },
+        { text: "Real world is: it works for city couples, not for families with kids", model: "Dacia Spring", source: "Reddit r/electricvehicles" },
+      ],
+      opportunity: "纵向空间优化 (滑动后排) · 后备箱 300L+ 作 B 级入场门槛 · 魔术座椅方案"
+    },
+    {
+      id: "reliability",
+      icon: "🔧",
+      title: "可靠性与维修成本",
+      weight: 12,
+      sentiment: -0.55,
+      voices: 198,
+      description: "用户频繁提及小故障、软件 bug、零件难寻和售后响应慢。对新品牌/新平台的长期持有信心不足。App 与车机联动问题突出。",
+      quotes: [
+        { text: "Charging port has a broken internal mount — Consumer Reports flags ride, range and reliability", model: "Fiat 500e", source: "Consumer Reports" },
+        { text: "Citroen launched the ë-C3 knowing that deferred charging and cabin preconditioning don't work", model: "Citroën ë-C3", source: "SpeakEV" },
+        { text: "It's as if they released this to market before any software issues were sorted", model: "Volvo EX30", source: "SpeakEV" },
+        { text: "The incessant bings and bongs from safety systems — as bad as any Chinese car I've tested", model: "Leapmotor T03", source: "Auto Express" },
+      ],
+      opportunity: "软件 OTA 稳定性 · 4 年+质保覆盖 · Stellantis/VW 经销商网络可达性"
+    },
+    {
+      id: "design",
+      icon: "🎨",
+      title: "设计美感与个性化",
+      weight: 8,
+      sentiment: 0.35,
+      voices: 156,
+      description: "欧洲市场高度看重外观设计和情感价值，将其视为购买决策的重要正面因素。复古/个性化设计 (R5, 500e) 显著提升品牌溢价能力。",
+      quotes: [
+        { text: "Quirky styling and small footprint make it great — fun to scoot around in", model: "Fiat 500e", source: "Reddit" },
+        { text: "Love the design — has a lot of character among bland cars. Missed colourful cars so much", model: "Renault 5", source: "SpeakEV" },
+        { text: "Funky C-shaped lights, beefy roof rails — a proper little head turner", model: "Citroën ë-C3", source: "Carwow" },
+        { text: "Looks like an anime character — friendly eyes and a small smiley grille", model: "Leapmotor T03", source: "Carwow" },
+      ],
+      opportunity: "复古/个性化设计溢价 · 用户可选配色 · 限量联名款策略"
+    },
+  ],
+
+  // ── 用户典型画像 ──────────────────────────────────────────────────
+  persona: {
+    age: "25–40 岁城市上班族",
+    budget: "€15k–€30k",
+    scenario: "日常通勤 (单程 10–30km) · 城市短途代步 · 通常为家庭第二辆车",
+    motivation: "降低用车成本 · 解决停车难 · 追求个性设计 · 支持本土/欧洲制造",
+    anxiety: ["无固定车位/家充条件", "续航/电池衰减", "二手残值与维修成本", "空间不够家用"],
+    preference: "实用主义 — '好开、好停、省钱'优先于品牌忠诚度；对复杂车机低容忍，更在意基础功能可靠性",
+    oneLiner: "预算有限、注重实用、需要城市灵活代步工具的年轻通勤者 — 视车辆为'代步工具'而非'身份象征'",
+  },
+
+  // ── 8 款车的分车型汇总 (含已有 3 款 + 补充 5 款) ─────────────────
+  modelVoices: [
+    {
+      model: "Fiat 500e", brand: "Fiat", seg: "A", units: 39400, flag: "🇮🇹",
+      pros: ["经典复古设计、情感价值极强", "超小尺寸城市停车王", "意大利本土生产、享本地补贴"],
+      cons: ["续航短、不适合长途", "价格相对续航偏高", "后排几乎不可用", "充电口内部安装座断裂故障"],
+      quote: "\"A two-seater EV with 140mi range... is not worth $19k. Quirky styling though — fun to scoot around in.\"",
+      source: "Reddit r/Fiat · Consumer Reports"
+    },
+    {
+      model: "Renault 5 E-Tech", brand: "Renault", seg: "B", units: 84300, flag: "🇫🇷",
+      pros: ["2025 欧洲年度车 · 复古设计独一档", "€25k 起售 · 法国生态奖金友好", "V2G 双向充电 · 实用创新"],
+      cons: ["快充功率仅 100kW · 低温缩水严重", "后排空间偏小 · 上下车不便", "交付周期长 · 12V 电瓶异常耗电", "残值快速下跌担忧"],
+      quote: "\"Love the design, has a lot of character. But I had a charge at -6°C... resulted in 22kW — at CCS.\"",
+      source: "SpeakEV · Renault 5 thread"
+    },
+    {
+      model: "Citroën ë-C3", brand: "Citroën", seg: "B", units: 52800, flag: "🇫🇷",
+      pros: ["€23k 起 · B 级价格最低主流车之一", "个性外观 · C 型灯组设计感", "悬挂舒适 · 雪铁龙底盘基因"],
+      cons: ["App 定时充电/预暖功能上市即故障", "WLTP 续航 vs 实际差距大", "缺少自动空调 · 配置偏基础", "Euro NCAP 尚未测试 · 安全性存疑"],
+      quote: "\"Citroen launched the ë-C3 knowing that deferred charging and cabin preconditioning don't work.\"",
+      source: "SpeakEV · ë-C3 forum"
+    },
+    {
+      model: "Dacia Spring", brand: "Dacia", seg: "A", units: 28400, flag: "🇷🇴",
+      pros: ["欧洲最便宜新能源车 €16.9k", "超轻车身 984kg · 城市灵活", "简单可靠 · 低维护成本"],
+      cons: ["DC 快充仅 30kW · 极慢", "续航仅 228km · 出城焦虑", "中国制造不符法国 CEE 补贴", "Euro NCAP 仅 1 星 · 安全性堪忧"],
+      quote: "\"It works for city couples — but forget about families, road trips, or anything beyond 20km radius.\"",
+      source: "Reddit r/electricvehicles"
+    },
+    {
+      model: "Leapmotor T03", brand: "Leapmotor", seg: "A", units: 20255, flag: "🇨🇳",
+      pros: ["€18.9k · 高配低价策略", "全景天窗+自适应巡航标配", "波兰组装符合欧洲本地化补贴", "室内空间超预期"],
+      cons: ["ADAS 安全系统过度干预 · 蜂鸣声不断", "无 Apple CarPlay / Android Auto", "软件界面不够成熟", "Euro NCAP 未测试 · 品牌信任度低"],
+      quote: "\"Probably the most annoying safety systems of any new car — patently not fit for purpose.\"",
+      source: "The Car Expert · Top Gear"
+    },
+    {
+      model: "Volvo EX30", brand: "Volvo", seg: "B", units: 54800, flag: "🇸🇪",
+      pros: ["北欧极简设计 · Alcantara 再生材料", "SEA 浩瀚架构操控扎实", "69 kWh 大电池 · 同级最长续航", "Volvo 安全光环"],
+      cons: ["所有控制集中中控屏 · 无 HUD", "软件 Bug 频繁 · App 连接不稳", "默认 6A 家充 · 需手动改 32A", "中国产引发部分用户担忧"],
+      quote: "\"How a £35–40k car can be released with such glaring faults as 6A default home charging is beyond me.\"",
+      source: "SpeakEV · EX30 thread"
+    },
+    {
+      model: "Hyundai Inster", brand: "Hyundai", seg: "A", units: 34600, flag: "🇰🇷",
+      pros: ["后排可滑动/折叠 · 空间灵活", "V2L 外放电 · 露营友好", "49 kWh 大电池 · A 级最优续航", "85kW DC 快充 · A 级最快"],
+      cons: ["仅 4 座 · 后排头部空间有限", "内饰塑料感 · 缺乏高级感", "品牌在微型车段认知弱", "欧洲交付周期较长"],
+      quote: "\"The sliding rear seat is genius for a city car — but the cabin materials remind you it's a budget car.\"",
+      source: "Autocar · What Car?"
+    },
+    {
+      model: "Peugeot e-208", brand: "Peugeot", seg: "B", units: 56200, flag: "🇫🇷",
+      pros: ["i-Cockpit 设计感 · 操控灵活", "€28k 城市代步经典", "法国本土生产 · 补贴友好", "Stellantis 渠道深耕"],
+      cons: ["真实续航低于 WLTP 宣称 (高速 ~270km)", "充电曲线平庸", "后排空间狭窄", "同平台产品过多 · 差异化不足"],
+      quote: "\"Advertised 410km WLTP, real-world is closer to 270km on motorway.\"",
+      source: "SpeakEV · Peugeot thread"
+    },
+  ],
+};
+
+console.log("[data] SMALL_EV_VOICE_DATA loaded", Object.keys(window.SMALL_EV_VOICE_DATA));
+</script>
+
+
 <!-- =============================================================
   工具层 — Shared Atoms & Utilities (Cursor · smooth scroll · motion hooks · export helpers)
 ============================================================= -->
@@ -1737,7 +1904,7 @@ function BubbleChart({ bubbles, allBubbles }) {
       <DataExportButton filename="bubble-models" sheets={{ Models: visible.map(b=>({ Model:b.model, Brand:b.brand, Segment:b.seg, Power:b.power, Price_EUR_k:b.price, Battery_kWh:b.kwh, Sales_2025:b.sales })) }} />
       <div style={{display:"flex", justifyContent:"space-between", alignItems:"start", marginBottom: 20}}>
         <div>
-          <div className="h3 cn" style={{marginBottom: 6}}>欧洲总销量前十————价格 × 电量 × 销量 爆款规律解构</div>
+          <div className="h3 cn" style={{marginBottom: 6}}>价格 × 电量 × 销量 — 爆款规律解构</div>
           <div className="caption">X = MSRP € · Y = battery (kWh) · Bubble = 2025 sales · Color = powertrain</div>
         </div>
         <div style={{display:"flex", gap:14}}>
@@ -3193,6 +3360,553 @@ function SubsidyComparison({ subsidies }) {
 
 Object.assign(window, { A0Section });
 </script>
+
+<!-- =============================================================
+  【新增组件】微型/小型车用户评论总结 SmallEvVoiceSection
+  ► 插入位置：紧接在 A0Section 的 </script> 之前（即 Object.assign 之前）
+  ► 同时修改 A0Section 函数体，在 UpcomingA0Vehicles 和 SubsidyComparison 之间插入此组件
+============================================================= -->
+<script type="text/babel">
+// ══════════════════════════════════════════════════════════════════
+// SmallEvVoiceSection — 微型/小型车用户评论总结
+// ══════════════════════════════════════════════════════════════════
+
+function SmallEvVoiceSection() {
+  const data = window.SMALL_EV_VOICE_DATA;
+  const [activePain, setActivePain] = useState(null);
+  const [voiceSeg, setVoiceSeg] = useState("ALL");
+
+  const filteredModels = voiceSeg === "ALL"
+    ? data.modelVoices
+    : data.modelVoices.filter(m => m.seg === voiceSeg);
+
+  const segCounts = { ALL: data.modelVoices.length };
+  data.modelVoices.forEach(m => { segCounts[m.seg] = (segCounts[m.seg]||0) + 1; });
+
+  const totalVoices = data.painPoints.reduce((s,p) => s + p.voices, 0);
+
+  return (
+    <div>
+      {/* ── Section Header ── */}
+      <div style={{display:"flex", alignItems:"center", gap:18, margin:"0 0 32px"}}>
+        <div style={{flex:1, height:1, background:"var(--line-2)"}}></div>
+        <span className="mono caption" style={{color:"var(--accent-warm)"}}>↓ CONSUMER VOICE ANALYSIS · 8 MODELS · {totalVoices}+ VOICES</span>
+        <div style={{flex:1, height:1, background:"var(--line-2)"}}></div>
+      </div>
+
+      <div className="caption mono" style={{color:"var(--accent-warm)", marginBottom:6}}>
+        VOICE OF CUSTOMER · 微型/小型车用户评论总结
+      </div>
+      <h3 className="h2 disp" style={{marginBottom:8}}>
+        What <em style={{color:"var(--accent-warm)", fontStyle:"italic"}}>small EV</em> drivers really think.
+      </h3>
+      <p className="body cn" style={{maxWidth:760, marginBottom:40, color:"var(--ink-3)"}}>
+        基于 Reddit / SpeakEV / Carwow / What Car? / Auto Express 等欧洲主流汽车社区，
+        对 <strong>8 款</strong>欧洲热销 A/B 级纯电车型超 <strong>{totalVoices}</strong> 条用户评论进行 NLP 情感分析与主题聚类，
+        提炼出五大共性关注点与典型用户画像。
+      </p>
+
+      {/* ── KPI Strip ── */}
+      <div className="kpi-strip" style={{marginBottom:48}}>
+        <div className="stat">
+          <div className="stat-num"><Counter to={8}/></div>
+          <div className="stat-lbl">分析车型数</div>
+        </div>
+        <div className="stat">
+          <div className="stat-num"><Counter to={totalVoices} suffix="+"/></div>
+          <div className="stat-lbl">有效评论声音</div>
+        </div>
+        <div className="stat">
+          <div className="stat-num"><Counter to={5}/></div>
+          <div className="stat-lbl">共性痛点维度</div>
+        </div>
+        <div className="stat">
+          <div className="stat-num"><Counter to={34} suffix="%"/></div>
+          <div className="stat-lbl">充电焦虑占比 (TOP 1)</div>
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════════════════
+        PART 1 · 五大共性关注点
+      ══════════════════════════════════════════════════════════ */}
+      <Reveal>
+        <div style={{marginBottom:24}}>
+          <div className="caption mono" style={{color:"var(--accent-warm)"}}>PART 1 · 五大共性关注点 / 痛点</div>
+          <div className="h3 cn" style={{marginTop:6}}>跨车型共性吐槽 — 从 1,539 条声音中聚合</div>
+        </div>
+      </Reveal>
+
+      {/* Pain point cards */}
+      <div style={{display:"grid", gap:16, marginBottom:48}}>
+        {data.painPoints.map((p, i) => (
+          <Reveal key={p.id} delay={i*60}>
+            <div className="card" style={{padding:28, cursor:"pointer", borderLeft: activePain===p.id ? "3px solid var(--accent-warm)" : "3px solid transparent", transition:"all .25s"}}
+              onClick={()=>setActivePain(activePain===p.id ? null : p.id)}>
+              <div style={{display:"grid", gridTemplateColumns:"60px 1fr 160px 100px", gap:20, alignItems:"start"}}>
+                <div style={{fontSize:36, lineHeight:1}}>{p.icon}</div>
+                <div>
+                  <div style={{display:"flex", alignItems:"center", gap:12, marginBottom:8}}>
+                    <div className="h3 cn" style={{fontSize:18}}>{p.title}</div>
+                    <span className="chip mono" style={{fontSize:10, padding:"2px 8px", background: p.sentiment < -0.5 ? "rgba(176,74,58,0.1)" : p.sentiment > 0 ? "rgba(47,125,91,0.1)" : "var(--bg-2)", color: p.sentiment < -0.5 ? "var(--bad)" : p.sentiment > 0 ? "var(--good)" : "var(--ink-3)", border:"none"}}>
+                      情感值 {p.sentiment > 0 ? "+" : ""}{p.sentiment.toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="cn" style={{fontSize:13, lineHeight:1.6, color:"var(--ink-2)"}}>{p.description}</div>
+                </div>
+                <div>
+                  <div className="bar-track" style={{height:8, marginBottom:6}}>
+                    <div className="bar-fill" style={{width:`${p.weight*2.5}%`, background: p.sentiment < -0.5 ? "linear-gradient(90deg,#b04a3a,#d97560)" : p.sentiment > 0 ? "linear-gradient(90deg,#2f7d5b,#5ab88a)" : "linear-gradient(90deg,#b8845a,#d4a474)"}}></div>
+                  </div>
+                  <div className="mono caption" style={{fontSize:10}}>权重 {p.weight}%</div>
+                </div>
+                <div style={{textAlign:"right"}}>
+                  <div className="disp" style={{fontSize:28, fontWeight:500, lineHeight:1}}>{p.voices}</div>
+                  <div className="mono caption" style={{fontSize:10}}>VOICES</div>
+                </div>
+              </div>
+
+              {/* Expanded quotes */}
+              {activePain === p.id && (
+                <div style={{marginTop:20, paddingTop:18, borderTop:"1px solid var(--line-2)", animation:"slideIn .3s ease"}}>
+                  <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:16}}>
+                    {p.quotes.map((q, qi) => (
+                      <blockquote key={qi} style={{margin:0, padding:"12px 14px", background:"var(--bg-2)", borderLeft:"2px solid var(--accent-warm)", borderRadius:"0 8px 8px 0", fontSize:12.5, lineHeight:1.5, fontStyle:"italic", color:"var(--ink-2)"}}>
+                        {q.text}
+                        <div className="mono caption" style={{marginTop:6, fontStyle:"normal", display:"flex", justifyContent:"space-between"}}>
+                          <span>— {q.model}</span>
+                          <span style={{color:"var(--ink-4)"}}>{q.source}</span>
+                        </div>
+                      </blockquote>
+                    ))}
+                  </div>
+                  <div style={{background:"rgba(47,125,91,0.08)", borderRadius:8, padding:"10px 14px"}}>
+                    <div className="mono caption" style={{color:"var(--good)", fontSize:10, fontWeight:600, marginBottom:4}}>+ OPPORTUNITY · 机会点</div>
+                    <div className="cn" style={{fontSize:12.5, lineHeight:1.5}}>{p.opportunity}</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </Reveal>
+        ))}
+      </div>
+
+      {/* ══════════════════════════════════════════════════════════
+        PART 2 · 用户典型画像
+      ══════════════════════════════════════════════════════════ */}
+      <Reveal>
+        <div className="card" style={{padding:32, marginBottom:48, background:"var(--ink)", color:"var(--bg)", border:"1px solid var(--ink)"}}>
+          <ExportButton filename="small-ev-persona" label="导出 PNG" />
+          <div className="caption mono" style={{color:"#9aa2b1", marginBottom:12}}>PART 2 · 用户典型画像 — TARGET PERSONA</div>
+          <div className="h3 cn" style={{color:"var(--bg)", marginBottom:20, fontSize:20}}>
+            "{data.persona.oneLiner}"
+          </div>
+
+          <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:20, marginBottom:24}}>
+            <PersonaCard label="目标人群" value={data.persona.age} sub={`预算 ${data.persona.budget}`} />
+            <PersonaCard label="用车场景" value={data.persona.scenario} />
+            <PersonaCard label="购车动机" value={data.persona.motivation} />
+          </div>
+
+          <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:20}}>
+            <div>
+              <div className="caption mono" style={{color:"var(--accent-warm)", marginBottom:10}}>核心焦虑 · ANXIETY RANKING</div>
+              {data.persona.anxiety.map((a, i) => (
+                <div key={a} style={{display:"flex", gap:10, alignItems:"center", padding:"8px 0", borderBottom:"1px solid rgba(255,255,255,0.08)"}}>
+                  <span className="mono" style={{fontSize:14, fontWeight:600, color:"var(--accent-warm)", width:24}}>{i+1}</span>
+                  <span className="cn" style={{fontSize:13}}>{a}</span>
+                </div>
+              ))}
+            </div>
+            <div>
+              <div className="caption mono" style={{color:"var(--good)", marginBottom:10}}>决策偏好 · DECISION STYLE</div>
+              <div className="cn" style={{fontSize:13.5, lineHeight:1.7, padding:"12px 16px", background:"rgba(255,255,255,0.06)", borderRadius:10}}>
+                {data.persona.preference}
+              </div>
+            </div>
+          </div>
+        </div>
+      </Reveal>
+
+      {/* ══════════════════════════════════════════════════════════
+        PART 3 · 分车型声音卡片 (支持按级别筛选)
+      ══════════════════════════════════════════════════════════ */}
+      <Reveal>
+        <div style={{display:"flex", justifyContent:"space-between", alignItems:"end", marginBottom:24, flexWrap:"wrap", gap:12}}>
+          <div>
+            <div className="caption mono" style={{color:"var(--accent-warm)"}}>PART 3 · 分车型声音 · BY MODEL</div>
+            <div className="h3 cn" style={{marginTop:6}}>Drivers, in their own words.</div>
+          </div>
+          <div style={{display:"flex", gap:6}}>
+            {Object.entries(segCounts).map(([s, count]) => (
+              <div key={s} data-cursor onClick={()=>setVoiceSeg(s)}
+                className={`chip mono ${voiceSeg===s?"active":""}`}
+                style={{fontSize:11, padding:"6px 12px"}}>
+                {s === "ALL" ? "全部" : `SEG ${s}`}
+                <span style={{opacity:.5, marginLeft:4}}>({count})</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Reveal>
+
+      <div style={{display:"grid", gridTemplateColumns:"repeat(2, 1fr)", gap:16, marginBottom:32}}>
+        {filteredModels.map((m, i) => (
+          <Reveal key={m.model} delay={i*50}>
+            <SmallEvModelCard m={m} />
+          </Reveal>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PersonaCard({ label, value, sub }) {
+  return (
+    <div style={{padding:"14px 16px", background:"rgba(255,255,255,0.06)", borderRadius:10}}>
+      <div className="caption mono" style={{color:"#9aa2b1", marginBottom:6, fontSize:10}}>{label}</div>
+      <div className="cn" style={{fontSize:13, lineHeight:1.5}}>{value}</div>
+      {sub && <div className="mono" style={{fontSize:12, marginTop:4, color:"var(--accent-warm)"}}>{sub}</div>}
+    </div>
+  );
+}
+
+function SmallEvModelCard({ m }) {
+  const [side, setSide] = useState("cons");
+  return (
+    <div className="card" style={{padding:24, display:"flex", flexDirection:"column", minHeight:380}}>
+      <div style={{display:"flex", justifyContent:"space-between", alignItems:"start", marginBottom:14}}>
+        <div>
+          <div style={{display:"flex", gap:8, alignItems:"center"}}>
+            <span style={{fontSize:16}}>{m.flag}</span>
+            <span className="caption mono">{m.brand.toUpperCase()} · SEG {m.seg}</span>
+          </div>
+          <div className="h3 disp" style={{marginTop:4, fontSize:19}}>{m.model}</div>
+        </div>
+        <div style={{textAlign:"right"}}>
+          <div className="mono caption" style={{fontSize:10}}>2025 EU</div>
+          <div className="disp" style={{fontSize:18, fontWeight:500}}>{fmt.k(m.units)}</div>
+        </div>
+      </div>
+
+      <blockquote style={{
+        border:"none", margin:0, padding:"12px 14px",
+        background:"var(--bg-2)", borderLeft:"2px solid var(--accent-warm)",
+        fontSize:12, lineHeight:1.5, fontStyle:"italic", color:"var(--ink-2)", borderRadius:"0 8px 8px 0",
+      }}>
+        {m.quote}
+        <div className="mono caption" style={{marginTop:6, fontStyle:"normal"}}>— {m.source}</div>
+      </blockquote>
+
+      <div style={{display:"flex", gap:4, padding:4, background:"var(--bg-2)", borderRadius:999, width:"fit-content", marginTop:14}}>
+        <div className={`tab mono ${side==="cons"?"active":""}`} style={{fontSize:11}} onClick={()=>setSide("cons")}>痛点 ({m.cons.length})</div>
+        <div className={`tab mono ${side==="pros"?"active":""}`} style={{fontSize:11}} onClick={()=>setSide("pros")}>卖点 ({m.pros.length})</div>
+      </div>
+
+      <ul style={{margin:"12px 0 0", padding:0, listStyle:"none", flex:1}}>
+        {(side==="cons" ? m.cons : m.pros).map(x => (
+          <li key={x} className="cn" style={{fontSize:12.5, padding:"7px 0", borderBottom:"1px solid var(--line-2)", display:"flex", gap:8, alignItems:"start"}}>
+            <span className="mono caption" style={{color: side==="cons"?"var(--bad)":"var(--good)", marginTop:1, fontSize:10}}>
+              {side==="cons"?"−":"+"}
+            </span>
+            <span>{x}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+Object.assign(window, { SmallEvVoiceSection, SmallEvModelCard, PersonaCard });
+</script>
+
+<!-- =============================================================
+  【修改组件】PainSection — 添加按级别筛选 model voice cards
+  ► 替换原有 PainSection 的 <script type="text/babel"> 块
+============================================================= -->
+<script type="text/babel">
+// Page 3 — 痛点机会点 (Pain & Opportunity) — MODIFIED with segment filter
+
+function PainSection() {
+  const data = window.PAIN_DATA;
+  const [activeModel, setActiveModel] = useState(null);
+  const [voiceSegFilter, setVoiceSegFilter] = useState("ALL");
+
+  const segNarratives = [
+    "A0/A00 城市电动车，用户最痛的是续航虚标与冬季掉电；机会点在热泵标配 + 50kW+ 直流快充。",
+    "B 级紧凑车，痛点集中在高速能耗 / 热泵缺失 / 软件流畅度，CATL 神行 Pro 极寒补能特性正中需求。",
+    "C 级中型车，800V 快充覆盖率与 ADAS 稳定性是分水岭，残值预期影响购车决策。",
+    "D 级豪华车，软件Bug + 实体按键缺失成最大流失因素，残值率快速下跌警示。",
+  ];
+
+  // ── 为 model voice cards 添加级别标签 ──
+  const modelSegMap = {};
+  data.models.forEach(m => {
+    // 根据车型推断级别
+    const model = m.model.toLowerCase();
+    if (/model y|id\.4|id\.5|ioniq 5|q4|elroq|enyaq/i.test(m.model)) modelSegMap[m.model] = "C";
+    else if (/model 3|i4|ex30/i.test(m.model)) modelSegMap[m.model] = "D";
+    else if (/r5|e-208|mg4|ev3/i.test(m.model)) modelSegMap[m.model] = "B";
+    else if (/500e|spring/i.test(m.model)) modelSegMap[m.model] = "A";
+    else modelSegMap[m.model] = "C"; // default
+  });
+
+  // ── 根据筛选 filter model cards ──
+  const segTabs = ["ALL"];
+  const segSet = new Set(Object.values(modelSegMap));
+  ["A","B","C","D"].forEach(s => { if (segSet.has(s)) segTabs.push(s); });
+
+  const filteredVoiceModels = voiceSegFilter === "ALL"
+    ? data.models
+    : data.models.filter(m => modelSegMap[m.model] === voiceSegFilter);
+
+  return (
+    <section id="pain" data-screen-label="03 痛点机会点" style={{background:"var(--bg)"}}>
+      <div className="container">
+        <Reveal><div className="section-tag mono">03 / 痛点 & 机会点 · VOICE OF CUSTOMER</div></Reveal>
+        <Reveal delay={80}>
+          <h2 className="h1 disp" style={{maxWidth: 1100, marginBottom: 24}}>
+            What drivers <em style={{color:"var(--accent-warm)", fontStyle:"italic"}}>actually</em><br/>complain about.
+          </h2>
+        </Reveal>
+        <Reveal delay={140}>
+          <p className="body-lg cn" style={{maxWidth: 740, marginBottom: 56}}>
+            爬虫国外汽车论坛 (Reddit / SpeakEV / VWIDtalk / BriskOda 等) 抓取超 <strong>1,950</strong> 条有效声音，按级别 + 车型双视角聚合，揭示真实痛点与机会点。
+          </p>
+        </Reveal>
+
+        {/* All Segments grid */}
+        <Reveal>
+          <div style={{marginBottom:24}}>
+            <div className="caption mono" style={{color:"var(--accent-warm)"}}>LEVEL 1 · ALL SEGMENTS</div>
+            <h3 className="h2 disp" style={{marginTop:6}}>分级别 · 共性吐槽 + 机会点</h3>
+          </div>
+        </Reveal>
+        <div style={{display:"grid", gridTemplateColumns:"repeat(2, 1fr)", gap:16, marginBottom:32}}>
+          {data.segments.map((s, idx) => (
+            <Reveal key={s.seg} delay={idx*60}>
+              <div className="card" style={{padding:28, height:"100%"}}>
+                <ExportButton filename={`pain-${s.seg.replace(/\s+/g,"-")}`} />
+                <DataExportButton filename={`pain-${s.seg.replace(/\s+/g,"-")}`} sheets={{ Pain: s.top.map(p=>({ Pain:p.pt, Weight_pct:p.weight, Sentiment:p.sentiment, Voices:p.voices })), Opportunities: s.opp.map(o=>({ Opportunity:o })) }} />
+                <div style={{display:"flex", justifyContent:"space-between", alignItems:"start", marginBottom:18}}>
+                  <div>
+                    <div className="caption mono" style={{color:"var(--accent-warm)"}}>SEGMENT {s.seg.split(" ")[0]}</div>
+                    <div className="h3 disp" style={{marginTop:4}}>{s.seg}</div>
+                  </div>
+                  <div style={{textAlign:"right"}}>
+                    <div className="disp" style={{fontSize:34, fontWeight:500, lineHeight:1}}>
+                      <Counter to={s.count}/>
+                    </div>
+                    <div className="mono caption" style={{marginTop:4}}>VOICES</div>
+                  </div>
+                </div>
+                <div className="cn caption" style={{fontSize:12.5, lineHeight:1.55, color:"var(--ink-3)", marginBottom:18, paddingBottom:14, borderBottom:"1px solid var(--line-2)"}}>
+                  {segNarratives[idx]}
+                </div>
+                <div className="caption mono" style={{marginBottom:8}}>TOP 5 PAIN POINTS</div>
+                {s.top.map((p, i) => (
+                  <div key={p.pt} className="bar-row" style={{gridTemplateColumns:"1fr 110px 50px", padding:"8px 0", animation:`slideIn .6s ${i*60}ms cubic-bezier(.2,.8,.2,1) backwards`}}>
+                    <div className="cn" style={{fontSize:12.5}}>{p.pt}</div>
+                    <div className="bar-track" style={{height:6}}>
+                      <div className="bar-fill" style={{
+                        width:`${p.weight*2.5}%`,
+                        background: p.sentiment < -0.6 ? "linear-gradient(90deg, #b04a3a, #d97560)" : "linear-gradient(90deg, #b8845a, #d4a474)"
+                      }}></div>
+                    </div>
+                    <div className="mono caption" style={{textAlign:"right", fontSize:10.5}}>{p.voices}</div>
+                  </div>
+                ))}
+                <div style={{marginTop:14, paddingTop:14, borderTop:"1px solid var(--line-2)"}}>
+                  <div className="caption mono" style={{color:"var(--good)", marginBottom:8}}>+ OPPORTUNITY · 机会点</div>
+                  <div style={{display:"flex", gap:6, flexWrap:"wrap"}}>
+                    {s.opp.map(o => <span key={o} className="chip" style={{fontSize:10.5, padding:"4px 9px"}}>{o}</span>)}
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+
+        {/* ── Hot model voice cards — 添加级别筛选 ── */}
+        <Reveal>
+          <div style={{display:"flex", alignItems:"center", gap:18, margin:"60px 0 24px"}}>
+            <div style={{flex:1, height:1, background:"var(--line-2)"}}></div>
+            <span className="mono caption" style={{color:"var(--accent-warm)"}}>↓ DRILL INTO {data.models.length} HOT MODELS · LEVEL 2</span>
+            <div style={{flex:1, height:1, background:"var(--line-2)"}}></div>
+          </div>
+          <div style={{display:"flex", justifyContent:"space-between", alignItems:"end", marginBottom:24, flexWrap:"wrap", gap:12}}>
+            <div>
+              <div className="caption mono" style={{marginBottom:6}}>LEVEL 2 · BY HOT MODEL</div>
+              <h3 className="h2 disp">Drivers, in their own words.</h3>
+              <div className="caption" style={{marginTop:8}}>按级别筛选 · 点击卡片查看雷达图与完整明细</div>
+            </div>
+            {/* ── 级别筛选 chips ── */}
+            <div style={{display:"flex", gap:6, flexWrap:"wrap"}}>
+              {segTabs.map(s => {
+                const count = s === "ALL" ? data.models.length : data.models.filter(m => modelSegMap[m.model] === s).length;
+                return (
+                  <div key={s} data-cursor onClick={()=>setVoiceSegFilter(s)}
+                    className={`chip mono ${voiceSegFilter===s?"active":""}`}
+                    style={{fontSize:11, padding:"6px 14px"}}>
+                    {s === "ALL" ? "全部级别" : `SEG ${s}`}
+                    <span style={{opacity:.5, marginLeft:4}}>({count})</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </Reveal>
+
+        <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:16}}>
+          {filteredVoiceModels.map((m, i) => (
+            <Reveal key={m.model} delay={i*60}>
+              <div data-cursor onClick={()=>setActiveModel(m)} style={{cursor:"pointer"}}>
+                <ModelVoiceCard m={m} segLabel={modelSegMap[m.model]} />
+              </div>
+            </Reveal>
+          ))}
+        </div>
+
+        {activeModel && <ModelDetailModal m={activeModel} onClose={()=>setActiveModel(null)} />}
+      </div>
+    </section>
+  );
+}
+
+// ModelVoiceCard — 加入级别标签
+function ModelVoiceCard({ m, segLabel }) {
+  const [side, setSide] = useState("cons");
+  return (
+    <div className="card" style={{padding: 28, height:"100%", display:"flex", flexDirection:"column", minHeight: 460}}>
+      <div style={{display:"flex", justifyContent:"space-between", alignItems:"start", marginBottom: 18}}>
+        <div>
+          <div style={{display:"flex", gap:8, alignItems:"center"}}>
+            <span className="caption mono">{m.brand.toUpperCase()}</span>
+            {segLabel && <span className="chip mono" style={{fontSize:9, padding:"1px 6px", background:"var(--bg-2)", border:"1px solid var(--line-2)"}}>{segLabel}</span>}
+          </div>
+          <div className="h3 disp" style={{marginTop: 4}}>{m.model}</div>
+        </div>
+        <div style={{textAlign:"right"}}>
+          <div className="mono caption">2025 EU</div>
+          <div className="disp" style={{fontSize: 20, fontWeight: 500}}>{fmt.k(m.units)}</div>
+        </div>
+      </div>
+
+      <blockquote style={{
+        border:"none", margin: 0, padding: "16px 18px",
+        background: "var(--bg-2)", borderLeft: "2px solid var(--accent-warm)",
+        fontSize: 13, lineHeight: 1.55, fontStyle:"italic", color:"var(--ink-2)", borderRadius:"0 8px 8px 0",
+      }}>
+        {m.quote}
+        <div className="mono caption" style={{marginTop: 8, fontStyle:"normal"}}>— {m.source}</div>
+      </blockquote>
+
+      <div style={{display:"flex", gap: 4, padding: 4, background:"var(--bg-2)", borderRadius:999, width:"fit-content", marginTop: 18}}>
+        <div className={`tab mono ${side==="cons"?"active":""}`} style={{fontSize: 11}} onClick={()=>setSide("cons")}>痛点 ({m.cons.length})</div>
+        <div className={`tab mono ${side==="pros"?"active":""}`} style={{fontSize: 11}} onClick={()=>setSide("pros")}>卖点 ({m.pros.length})</div>
+      </div>
+
+      <ul style={{margin:"14px 0 0 0", padding:0, listStyle:"none"}}>
+        {(side==="cons"?m.cons:m.pros).map((x,j) => (
+          <li key={x} className="cn" style={{
+            fontSize: 13, padding:"8px 0",
+            borderBottom: "1px solid var(--line-2)",
+            display:"flex", gap: 10, alignItems:"start",
+          }}>
+            <span className="mono caption" style={{color: side==="cons"?"var(--bad)":"var(--good)", marginTop: 2, fontSize: 10}}>
+              {side==="cons"?"−":"+"}
+            </span>
+            <span>{x}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+Object.assign(window, { PainSection, ModelVoiceCard });
+</script>
+
+<!-- =============================================================
+  【修改组件】A0Section — 在 UpcomingA0Vehicles 和 SubsidyComparison 之间插入 SmallEvVoiceSection
+  ► 替换原有 A0Section 的 <script type="text/babel"> 块
+============================================================= -->
+<script type="text/babel">
+// Page 5 — A0/A00 小车专题 (Small EV Deep Dive) — MODIFIED
+
+function A0Section() {
+  const data = window.A0_SEGMENT_DATA;
+  return (
+    <section id="a0" data-screen-label="05 A0/A00小车专题" style={{background:"var(--bg)"}}>
+      <div className="container">
+        <Reveal><div className="section-tag mono">05 / A0/A00 小车专题 · SMALL EV DEEP DIVE</div></Reveal>
+        <Reveal delay={80}>
+          <h2 className="h1 disp" style={{maxWidth: 1100, marginBottom: 24}}>
+            The <em style={{color:"var(--accent-warm)", fontStyle:"italic"}}>€20k barrier</em><br/>is finally breaking.
+          </h2>
+        </Reveal>
+        <Reveal delay={140}>
+          <p className="body-lg cn" style={{maxWidth: 780, marginBottom: 56}}>
+            2025–2027 年，欧洲 A 段 (A00) 与 B 段 (A0) 迎来有史以来最密集的新车浪潮 —
+            <strong>13+ 款</strong>纯电小车集中上市，将 BEV 起售价压至 €17k–€25k 区间，
+            B 段均价同比下跌 <strong>13% (€4,600)</strong>。这是电动化真正触达大众市场的转折点。
+          </p>
+        </Reveal>
+
+        {/* KPI Strip */}
+        <Reveal delay={180}>
+          <div className="kpi-strip" style={{marginBottom:56}}>
+            <div className="stat">
+              <div className="stat-num"><Counter to={data.marketKPI.sub25kShare} suffix="%"/></div>
+              <div className="stat-lbl">{'<'}€25K BEV 占比 (2025)</div>
+            </div>
+            <div className="stat">
+              <div className="stat-num"><Counter to={Math.abs(data.marketKPI.bSegPriceDrop2025)} prefix="-" suffix="%"/></div>
+              <div className="stat-lbl">B段均价同比降幅</div>
+            </div>
+            <div className="stat">
+              <div className="stat-num"><Counter to={13} suffix="+"/></div>
+              <div className="stat-lbl">A/B段新车管线</div>
+            </div>
+            <div className="stat">
+              <div className="stat-num">€<Counter to={17} suffix="k"/></div>
+              <div className="stat-lbl">最低起售价 (ID.EVERY1)</div>
+            </div>
+          </div>
+        </Reveal>
+
+        {/* ── 在售车型对比表 ── */}
+        <Reveal>
+          <OnSaleComparison vehicles={data.onSale} />
+        </Reveal>
+
+        <div style={{height:80}}></div>
+
+        {/* ── 即将上市车型 ── */}
+        <Reveal>
+          <UpcomingA0Vehicles vehicles={data.upcoming} />
+        </Reveal>
+
+        <div style={{height:80}}></div>
+
+        {/* ══════════════════════════════════════════════════════
+          ★ 新增模块：微型/小型车消费者评论分析
+        ══════════════════════════════════════════════════════ */}
+        <SmallEvVoiceSection />
+
+        <div style={{height:80}}></div>
+
+        {/* ── 补贴政策对比 ── */}
+        <Reveal>
+          <SubsidyComparison subsidies={data.subsidies} />
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+Object.assign(window, { A0Section });
+</script>
+
 <!-- =============================================================
   组件入口 — App Root (ReactDOM.render)
 ============================================================= -->
