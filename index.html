@@ -3934,5 +3934,888 @@ root.render(<App />);
 
 </script>
 
+<!-- ══ Widget Styles — 完全复用平台 CSS 变量 ══ -->
+<style>
+/* ── 悬浮按钮 ── */
+#ev-ai-fab {
+  position: fixed;
+  bottom: 36px;
+  right: 36px;
+  z-index: 9000;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--ink);
+  border: 1px solid rgba(255,255,255,0.06);
+  cursor: pointer;
+  box-shadow: 0 8px 32px -8px rgba(20,23,28,0.5), 0 2px 8px rgba(20,23,28,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s cubic-bezier(.2,.8,.2,1), box-shadow 0.25s, background 0.25s;
+  outline: none;
+  overflow: hidden;
+}
+#ev-ai-fab:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 40px -10px rgba(20,23,28,0.55);
+}
+#ev-ai-fab.ev-open {
+  background: var(--accent-warm);
+  border-color: transparent;
+}
+#ev-ai-fab .ev-icon-ai,
+#ev-ai-fab .ev-icon-x {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.18s, transform 0.25s cubic-bezier(.2,.8,.2,1);
+}
+#ev-ai-fab .ev-icon-x {
+  opacity: 0;
+  transform: rotate(-45deg) scale(0.6);
+}
+#ev-ai-fab.ev-open .ev-icon-ai {
+  opacity: 0;
+  transform: rotate(45deg) scale(0.5);
+}
+#ev-ai-fab.ev-open .ev-icon-x {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+/* 未读提示点 */
+#ev-unread-dot {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent-warm);
+  border: 2px solid var(--bg);
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.3s cubic-bezier(.34,1.56,.64,1);
+  pointer-events: none;
+}
+#ev-unread-dot.ev-show { opacity: 1; transform: scale(1); }
+
+/* ── 面板 ── */
+#ev-ai-panel {
+  position: fixed;
+  bottom: 102px;
+  right: 36px;
+  z-index: 8999;
+  width: 420px;
+  height: 600px;
+  max-height: calc(100vh - 140px);
+  background: var(--bg);
+  border: 1px solid var(--line-2);
+  border-radius: 16px;
+  box-shadow: 0 32px 80px -20px rgba(20,23,28,0.28), 0 4px 20px rgba(20,23,28,0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(12px) scale(0.975);
+  pointer-events: none;
+  transition: opacity 0.22s cubic-bezier(.2,.8,.2,1), transform 0.22s cubic-bezier(.2,.8,.2,1);
+  transform-origin: bottom right;
+}
+#ev-ai-panel.ev-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: all;
+}
+
+/* ── 头部 ── */
+#ev-ai-header {
+  background: var(--ink);
+  padding: 18px 20px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+/* 背景装饰圆 */
+#ev-ai-header::before {
+  content: '';
+  position: absolute;
+  right: -40px; top: -40px;
+  width: 140px; height: 140px;
+  border-radius: 50%;
+  background: rgba(201,122,74,0.08);
+  pointer-events: none;
+}
+#ev-ai-header::after {
+  content: '';
+  position: absolute;
+  right: 60px; bottom: -30px;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: rgba(201,122,74,0.05);
+  pointer-events: none;
+}
+.ev-ai-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--accent-warm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--ff-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.ev-ai-title-wrap {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+.ev-ai-title {
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: #f7f5f0;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+.ev-ai-subtitle {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  color: rgba(247,245,240,0.35);
+  margin-top: 3px;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ev-ai-live {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #2f7d5b;
+  animation: evPulse 2s infinite;
+}
+@keyframes evPulse {
+  0%,100% { opacity: 1; } 50% { opacity: 0.35; }
+}
+.ev-hbtn {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(247,245,240,0.08);
+  color: rgba(247,245,240,0.45);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.ev-hbtn:hover { background: rgba(247,245,240,0.15); color: rgba(247,245,240,0.9); }
+.ev-header-btns { display: flex; gap: 5px; }
+
+/* ── 快捷问题 ── */
+#ev-ai-chips {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line-2);
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  background: var(--bg-2);
+}
+.ev-chip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg-3);
+  color: var(--ink-3);
+  font-family: var(--ff-mono);
+  font-size: 10.5px;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+.ev-chip:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+  background: var(--bg-3);
+}
+
+/* ── 消息区 ── */
+#ev-ai-msgs {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 16px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  scroll-behavior: smooth;
+}
+#ev-ai-msgs::-webkit-scrollbar { width: 4px; }
+#ev-ai-msgs::-webkit-scrollbar-track { background: transparent; }
+#ev-ai-msgs::-webkit-scrollbar-thumb { background: var(--line); border-radius: 2px; }
+
+/* ── 消息气泡 ── */
+.ev-msg {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  animation: evMsgIn 0.28s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes evMsgIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.ev-msg.ev-user { flex-direction: row-reverse; }
+
+.ev-msg-av {
+  width: 26px; height: 26px;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--ff-mono);
+  font-size: 9px;
+  font-weight: 600;
+  flex-shrink: 0;
+  letter-spacing: 0.04em;
+}
+.ev-msg.ev-bot  .ev-msg-av { background: var(--ink); color: var(--bg); }
+.ev-msg.ev-user .ev-msg-av { background: var(--bg-2); color: var(--ink-3); border: 1px solid var(--line-2); }
+
+.ev-bubble {
+  max-width: 80%;
+  padding: 10px 13px;
+  font-family: var(--ff-text), var(--ff-cn);
+  font-size: 13px;
+  line-height: 1.65;
+  word-break: break-word;
+}
+.ev-msg.ev-bot .ev-bubble {
+  background: var(--bg-3);
+  border: 1px solid var(--line-2);
+  border-radius: 3px 12px 12px 12px;
+  color: var(--ink);
+}
+.ev-msg.ev-user .ev-bubble {
+  background: var(--ink);
+  color: var(--bg);
+  border-radius: 12px 3px 12px 12px;
+}
+.ev-bubble strong { font-weight: 600; }
+.ev-bubble em { font-style: normal; color: var(--accent-warm); }
+.ev-msg.ev-user .ev-bubble em { color: #d4a474; }
+
+/* 错误状态 */
+.ev-bubble.ev-err {
+  background: rgba(176,74,58,0.08) !important;
+  border-color: rgba(176,74,58,0.2) !important;
+  color: var(--bad) !important;
+}
+
+/* 消息时间戳 */
+.ev-msg-meta {
+  font-family: var(--ff-mono);
+  font-size: 9.5px;
+  color: var(--ink-4);
+  margin-top: 4px;
+  padding: 0 2px;
+}
+.ev-msg.ev-user .ev-msg-meta { text-align: right; }
+
+/* ── 打字中 ── */
+.ev-typing-dots {
+  display: flex; gap: 4px; align-items: center;
+  padding: 2px 0;
+}
+.ev-typing-dots span {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--ink-4);
+  animation: evTyping 1.3s infinite;
+}
+.ev-typing-dots span:nth-child(2) { animation-delay: 0.18s; }
+.ev-typing-dots span:nth-child(3) { animation-delay: 0.36s; }
+@keyframes evTyping {
+  0%,60%,100% { transform: translateY(0); opacity: 0.35; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* ── 输入区 ── */
+#ev-ai-input-row {
+  border-top: 1px solid var(--line-2);
+  padding: 12px 14px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  flex-shrink: 0;
+  background: var(--bg-3);
+}
+#ev-ai-textarea {
+  flex: 1;
+  resize: none;
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-family: var(--ff-text), var(--ff-cn);
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--bg-2);
+  outline: none;
+  max-height: 96px;
+  min-height: 38px;
+  line-height: 1.5;
+  transition: border-color 0.18s, background 0.18s;
+}
+#ev-ai-textarea:focus {
+  border-color: var(--ink-3);
+  background: var(--bg-3);
+}
+#ev-ai-textarea::placeholder { color: var(--ink-4); font-family: var(--ff-mono); font-size: 12px; }
+
+#ev-ai-send {
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  border: none;
+  background: var(--ink);
+  color: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+#ev-ai-send:hover { opacity: 0.85; transform: translateY(-1px); }
+#ev-ai-send:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+
+/* ── 底部 footer ── */
+#ev-ai-footer {
+  padding: 6px 14px 8px;
+  text-align: center;
+  font-family: var(--ff-mono);
+  font-size: 9.5px;
+  color: var(--ink-4);
+  background: var(--bg-3);
+  flex-shrink: 0;
+  letter-spacing: 0.04em;
+  border-top: 1px solid var(--line-2);
+}
+
+/* ── 模型切换 ── */
+.ev-model-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 14px;
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--line-2);
+  flex-shrink: 0;
+  height: 34px;
+}
+.ev-model-btn {
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  color: var(--ink-4);
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.04em;
+}
+.ev-model-btn:hover { color: var(--ink); }
+.ev-model-btn.ev-model-on {
+  background: var(--bg-3);
+  border-color: var(--line-2);
+  color: var(--ink-2);
+  box-shadow: 0 1px 3px rgba(20,23,28,0.07);
+}
+.ev-model-sep {
+  height: 14px;
+  width: 1px;
+  background: var(--line-2);
+  margin: 0 2px;
+}
+.ev-model-label {
+  font-family: var(--ff-mono);
+  font-size: 9px;
+  color: var(--ink-4);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-right: 4px;
+}
+
+@media (max-width: 500px) {
+  #ev-ai-panel { width: calc(100vw - 24px); right: 12px; }
+  #ev-ai-fab { right: 16px; bottom: 20px; }
+}
+</style>
+
+<!-- ══ Widget HTML ══ -->
+
+<!-- 悬浮按钮 -->
+<button id="ev-ai-fab" aria-label="AI 智能问询" title="AI 问询 · DeepSeek">
+  <!-- AI 图标 -->
+  <span class="ev-icon-ai">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--bg)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2a7 7 0 0 1 7 7c0 2.5-1.3 4.7-3.2 6L15 21H9l-.8-6A7 7 0 0 1 12 2Z"/>
+      <path d="M9 21h6"/>
+    </svg>
+  </span>
+  <!-- 关闭图标 -->
+  <span class="ev-icon-x">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round">
+      <line x1="18" y1="6" x2="6" y2="18"/>
+      <line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  </span>
+  <span id="ev-unread-dot"></span>
+</button>
+
+<!-- 对话面板 -->
+<div id="ev-ai-panel" role="dialog" aria-label="EV Intelligence AI 助手">
+
+  <!-- 头部 -->
+  <div id="ev-ai-header">
+    <div class="ev-ai-avatar">AI</div>
+    <div class="ev-ai-title-wrap">
+      <div class="ev-ai-title">EV Intelligence Assistant</div>
+      <div class="ev-ai-subtitle">
+        <span class="ev-ai-live"></span>
+        <span>DeepSeek · 实时在线</span>
+      </div>
+    </div>
+    <div class="ev-header-btns">
+      <button class="ev-hbtn" id="ev-clear-btn" title="清空对话">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/>
+        </svg>
+      </button>
+      <button class="ev-hbtn" id="ev-close-btn" title="关闭">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- 模型切换 -->
+  <div class="ev-model-toggle">
+    <span class="ev-model-label">MODEL</span>
+    <button class="ev-model-btn ev-model-on" data-model="DeepSeek-V3-0324-64K-2">V3 · Chat</button>
+    <span class="ev-model-sep"></span>
+    <button class="ev-model-btn" data-model="DeepSeek-V3-0324-64K-2">R1 · Reasoner</button>
+  </div>
+
+  <!-- 快捷问题 -->
+  <div id="ev-ai-chips">
+    <button class="ev-chip" data-q="2025年欧洲BEV销量最高的车型是哪款？为什么？">🏆 销量冠军分析</button>
+    <button class="ev-chip" data-q="CATL在全球动力电池市场的份额是多少？主要竞争对手有哪些？">🔋 CATL市场地位</button>
+    <button class="ev-chip" data-q="欧洲A0/B级小型纯电车的用户最大痛点是什么？">⚡ 小车用户痛点</button>
+    <button class="ev-chip" data-q="VW集团的MEB+平台在研车型有哪些？SOP时间表如何？">🚗 MEB+在研车型</button>
+    <button class="ev-chip" data-q="德国、法国补贴政策对小型BEV的影响有何不同？">💰 补贴政策对比</button>
+  </div>
+
+  <!-- 消息区 -->
+  <div id="ev-ai-msgs">
+    <div class="ev-msg ev-bot">
+      <div class="ev-msg-av">AI</div>
+      <div>
+        <div class="ev-bubble">
+          你好！我是 <strong>EV Intelligence 分析助手</strong>，已加载平台全部市场数据，涵盖：<br><br>
+          📊 <strong>在售车型</strong>：22+ 款 2025 欧洲热销 BEV 数据<br>
+          🔬 <strong>在研项目</strong>：A–D 级 24 个研发管线<br>
+          🗣️ <strong>用户声音</strong>：1,950+ 条论坛评论聚合<br>
+          ⚔️ <strong>竞争格局</strong>：CATL 友商动态与市场份额<br>
+          🚘 <strong>A0/A00 专题</strong>：小型纯电深度分析<br><br>
+          有任何问题，直接问我！
+        </div>
+        <div class="ev-msg-meta">EV Intelligence · DeepSeek</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 输入区 -->
+  <div id="ev-ai-input-row">
+    <textarea id="ev-ai-textarea" placeholder="Ask about the EU EV market…" rows="1"></textarea>
+    <button id="ev-ai-send" title="发送 Enter">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+
+  <div id="ev-ai-footer">
+    POWERED BY DEEPSEEK &nbsp;·&nbsp; DATA: EV-VOLUMES / JATO / ACEA / SNE 2025 &nbsp;·&nbsp; INTERNAL USE ONLY
+  </div>
+</div>
+
+<!-- ══ Widget Script ══ -->
+<script>
+(function () {
+  // ════════════════════════════════════════════════════════════
+  //  ⚠ 开发者配置区
+  // ════════════════════════════════════════════════════════════
+  const DS_API_KEY  = 'sk-RHFxC3HuFH61cx984a3611277a36475fBf5cF3Da4b4eFe19'; // ← 填入你的 DeepSeek API Key
+  const MAX_TURNS   = 12;   // 保留最近对话轮数（节省 token）
+  const MAX_TOKENS  = 30000; // 单次回复最大 token 数
+  // ════════════════════════════════════════════════════════════
+
+  // ── System Prompt：完整平台数据摘要 ──────────────────────────
+  const SYS = `你是 EV Intelligence 平台的专属 AI 分析助手，服务对象为 CATL 海外乘用车事业部策略团队（SC-EC）。
+平台覆盖欧洲电动车市场的四大模块：在售车型、在研项目、用户痛点、竞争态势。
+数据均来自 EV-Volumes / JATO / ACEA / SNE Research / Reddit / SpeakEV，截至 2025-2026年。
+回答时直接引用具体数字，用中文回答，必要时以清单结构展示，用 **加粗** 标注关键数据。
+
+═══════════════════════════════════════════
+一、欧洲 BEV 市场总览（2025）
+═══════════════════════════════════════════
+- 欧盟 BEV 总注册量：**259万辆**，YoY **+29.7%**
+- BEV 市场份额：**19.5%**（2021年9.1% → 2025年19.5%）
+- CATL 全球动力电池份额：**42.1%**，装机 56.9 GWh，YoY +13.7%
+
+各国 BEV 销量与增速：
+- 🇩🇪 德国：572,000辆，+43.0%，份额18.2%
+- 🇬🇧 英国：447,000辆，+21.4%，份额17.3%
+- 🇫🇷 法国：336,000辆，+8.2%，份额13.0%
+- 🇳🇴 挪威：172,000辆，+50.7%，份额6.6%（BEV渗透率96%）
+- 🇳🇱 荷兰：158,000辆，+20.6%
+- 🇸🇪 瑞典：106,000辆，**-3.1%**（下滑）
+- 🇮🇹 意大利：88,000辆，+46.0%
+- 🇪🇸 西班牙：83,000辆，+62.0%
+
+═══════════════════════════════════════════
+二、热销车型分析
+═══════════════════════════════════════════
+• Tesla Model Y：150,605辆，D-SUV，€46k，75kWh — 欧洲绝对销冠
+• Tesla Model 3：94,087辆，D-Sedan，€42k，60kWh
+• VW ID.4/ID.5：88,420辆，C-SUV，€42k，77kWh
+• VW ID.3：71,200辆，C-Hatch，€37k，58kWh
+• Renault R5 E-Tech：84,300辆，B，€25k，52kWh — **2025欧洲年度车**
+• Citroën ë-C3：52,800辆，B-Hatch，€23k，44kWh — 欧盟最低价主流BEV之一
+• Kia EV3：72,400辆，B-SUV，€36k，58kWh
+• Skoda Elroq：78,140辆，C-SUV，€33k，55kWh
+• Audi Q4 e-tron：62,550辆，C-SUV，€53k，77kWh
+• MG4 EV：51,600辆，C-Hatch，€27k，64kWh
+• Volvo EX30：54,800辆，B-SUV，€36k，69kWh（SEA平台）
+• BYD（欧洲合计）：84,600辆，YoY **+212%**
+
+各国 TOP 5 原因摘要：
+- 德国：VW主场，ID.7旅行版+高速续航+企业税优
+- 法国：R5复古设计+生态奖金+本土生产
+- 英国：最开放市场，Model Y / MG4 / EX30三强
+- 挪威：96%渗透率，Model Y断层领先，偏好四驱大空间
+
+品牌 BEV+PHEV 排名（YoY增速）：
+VW(+78%) > Tesla(-27%) > Audi(+33%) > Skoda(+109%) > BMW(+18%) > Renault(+64%) > BYD(+212%) > Kia(+62%)
+
+═══════════════════════════════════════════
+三、各级别 BEV Top10 销量（2025 欧洲）
+═══════════════════════════════════════════
+D-SUV Top3：Model Y(154,394) > Scenic EV(37,766) > Ioniq 5(24,408)
+C-SUV Top3：Skoda Elroq(93,606) > Skoda Enyaq(78,824) > VW ID.4(71,405)
+D-Sedan Top3：Tesla Model 3(86,186) > BMW i4(39,875) > BYD SEAL(20,227)
+C-Sedan Top3：VW ID.3(79,711) > CUPRA Born(43,338) > MG4(26,718)
+E-Sedan Top3：VW ID.7(75,984) > Audi A6 e-tron(29,380) > Mercedes EQE(15,486)
+B-SUV Top3：Renault R5(82,835) > Volvo EX30(48,950) > Citroën ë-C3(48,769)
+B-Car Top3：Kia EV3(66,349) > Peugeot e-208(26,642) > MINI Cooper E(19,090)
+E-SUV Top3：Audi Q6 e-tron(56,431) > Polestar 4(26,166) > Porsche Macan(22,819)
+
+═══════════════════════════════════════════
+四、在研项目管线（R&D Pipeline）
+═══════════════════════════════════════════
+A级（City）：
+- Renault Twingo E-Tech：€19,490，27.5kWh LFP，263km，2026Q2，斯洛文尼亚产
+- VW ID.EVERY1：~€17,000，30kWh LFP，2027Q4，Up!精神续作
+- Dacia Spring 2.0：2026Q3小幅升级，25kWh LFP
+
+B级（Compact）：
+- VW ID.Polo：~€25,000，37/52kWh LFP/NMC，329/455km，2026Q4，MEB+平台，西班牙产
+- Skoda Epiq：~€25,000，38.5/55kWh LFP/NMC，315/430km，2026H2，DC 50/90/133kW
+- Cupra Raval：€25,950，37/52kWh，300/444km，2026夏上市，VZ版226hp
+- Audi A2 e-tron：~€35,000，58/79kWh LFP，426/600km，2026秋
+- Renault 4 E-Tech：已上市2025，40/52kWh，300/400km
+- BYD Atto 2：已上市2025/02，45.1/64.8kWh LFP，312-430km，**300.8V非800V**
+- Kia EV2：~€30,000，42/61kWh，317/448km，2026Q1已量产，22kW AC标配
+
+C级：VW ID.3 GTX Mk2（2026Q1），Hyundai Ioniq 3（800V，2026Q4）
+D级：BMW iX3 Neue Klasse（800V+圆柱电芯，2026Q1），Mercedes CLA EV（已上市，750km WLTP）
+
+标准 Pack 共性：
+- S1(38kWh/400V/LFP)：覆盖6款A/B级车型，协同度88%，节省€420/车
+- S2(52kWh/400V/LFP-NMC)：覆盖7款，协同度74%，节省€380/车
+- M1(60-80kWh/800V/NMC)：覆盖4款C级，协同度62%，节省€510/车
+
+═══════════════════════════════════════════
+五、用户痛点分析（1,950+条论坛声音）
+═══════════════════════════════════════════
+A0/A00 城市车：续航虚标+冬季掉电(34%) > 快充不足<50kW(28%) > 空间局促 > 软件卡顿
+B级紧凑：高速续航折损>30%(31%) > 热泵缺失(24%) > 后备箱容积 > 腿部空间
+C级中型：800V快充覆盖率(29%) > NVH风噪(22%) > ADAS不稳定(20%) > 维修成本高
+D级豪华：软件Bug/死机(33%) > 实体按键消失(25%) > 残值快速下跌(19%)
+
+车型具体吐槽：
+- Tesla Model Y："Phantom braking on highways" / 超充是最大护城河
+- VW ID.4："Infotainment freezes once a week" / 充电门冬季冻住
+- R5 E-Tech："charging at -6°C → 22kW at CCS"（低温快充严重缩水）
+- ë-C3：上市即Bug（定时充电/预暖功能失效）
+- Volvo EX30："所有控制在中控屏" / 默认6A家充需手动改32A
+- MG4："Drives better than cars twice the price — infotainment from 2018"
+
+A0/A00用户画像：25-40岁城市上班族，预算€15-30k，日均<50km通勤，城市第二辆车，核心焦虑=无固定家充+续航衰减+残值
+
+═══════════════════════════════════════════
+六、竞争态势（全球动力电池 Jan-Feb 2026）
+═══════════════════════════════════════════
+1. CATL：42.1%，56.9GWh，+13.7%
+2. BYD：13.4%，18.1GWh，-2.4%
+3. LG Energy Solution：8.7%，11.8GWh，-2.7%
+4. CALB：5.3%，7.1GWh，+8.0%
+5. Gotion：3.9%，5.3GWh，+14.0%
+6. Panasonic：4.3%，5.8GWh，-5.0%（Kansas 32GWh 2025/07投产）
+7. Samsung SDI：2.5%，3.3GWh，-21.9%（2027全固态量产规划）
+8. SK On：3.8%，5.2GWh，-12.9%（2026 LFP首产线）
+9. Eve Energy：2.4%，3.2GWh，+18.0%
+
+竞争动态：BYD 1,500kW超充桩+万站计划 / LG摩洛哥LFP工厂投产 / Toyota 2027-28全固态量产
+
+═══════════════════════════════════════════
+七、A0/A00 专题 · 政策与战略
+═══════════════════════════════════════════
+市场信号：€25k以下BEV占比仅6%(2025)→目标提升；B段均价同比-13%(-€4,600)
+补贴政策：
+- 法国CEE：€25k以下最高€5,700；社会租赁€100-150/月（2025/09重启）；中国制造不符合（Spring/Dolphin不满足碳足迹要求）
+- 德国：新补贴€3,000-3,600，家庭应税≤€80k，2026年重启；30亿欧元预算
+- 意大利：Ecobonus最高€11,000（报废+低收入），购价≤€35k
+- 欧盟：拟推70%本地化制造门槛获补贴（提案中）
+
+CATL战略含义：匈牙利Debrecen 100GWh工厂是进入欧洲BEV补贴体系的关键；MEB+三兄弟（Raval/ID.Polo/Epiq）LFP供应已确认部分来自CATL+PowerCo
+
+回答规范：
+1. 数据精确，加粗关键数字
+2. 复杂问题用要点列举
+3. 看板范围外的问题，诚实告知并给出建议方向
+4. 适当使用 📊🔋⚡🇩🇪🇫🇷🏆 等表情提升可读性`;
+
+  // ── 状态 ────────────────────────────────────────────────────
+  const fab       = document.getElementById('ev-ai-fab');
+  const panel     = document.getElementById('ev-ai-panel');
+  const msgs      = document.getElementById('ev-ai-msgs');
+  const textarea  = document.getElementById('ev-ai-textarea');
+  const sendBtn   = document.getElementById('ev-ai-send');
+  const closeBtn  = document.getElementById('ev-close-btn');
+  const clearBtn  = document.getElementById('ev-clear-btn');
+  const unreadDot = document.getElementById('ev-unread-dot');
+  const chips     = document.querySelectorAll('.ev-chip');
+  const modelBtns = document.querySelectorAll('.ev-model-btn');
+
+  let isOpen    = false;
+  let isLoading = false;
+  let history   = [];
+  let model     = 'DeepSeek-V3-0324-64K-2';
+
+  // ── 开关面板 ────────────────────────────────────────────────
+  function toggle() {
+    isOpen = !isOpen;
+    fab.classList.toggle('ev-open', isOpen);
+    panel.classList.toggle('ev-open', isOpen);
+    if (isOpen) {
+      unreadDot.classList.remove('ev-show');
+      setTimeout(() => textarea.focus(), 240);
+    }
+  }
+  fab.addEventListener('click', toggle);
+  closeBtn.addEventListener('click', () => { if (isOpen) toggle(); });
+
+  // ── 模型切换 ────────────────────────────────────────────────
+  modelBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      model = btn.dataset.model;
+      modelBtns.forEach(b => b.classList.toggle('ev-model-on', b === btn));
+    });
+  });
+
+  // ── 清空 ─────────────────────────────────────────────────────
+  clearBtn.addEventListener('click', () => {
+    history = [];
+    msgs.innerHTML = `
+      <div class="ev-msg ev-bot">
+        <div class="ev-msg-av">AI</div>
+        <div class="ev-bubble">对话已重置，请继续提问。</div>
+      </div>`;
+  });
+
+  // ── 快捷问题 ─────────────────────────────────────────────────
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const q = chip.dataset.q;
+      if (q && !isLoading) send(q);
+    });
+  });
+
+  // ── Textarea 自适应高度 ──────────────────────────────────────
+  textarea.addEventListener('input', () => {
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 96) + 'px';
+  });
+
+  // ── Enter 发送 ────────────────────────────────────────────────
+  textarea.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (!isLoading) send();
+    }
+  });
+  sendBtn.addEventListener('click', () => { if (!isLoading) send(); });
+
+  // ── 时间戳格式 ───────────────────────────────────────────────
+  function nowStr() {
+    const d = new Date();
+    return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+  }
+
+  // ── 添加气泡 ─────────────────────────────────────────────────
+  function appendMsg(role, html, meta) {
+    const div = document.createElement('div');
+    div.className = `ev-msg ev-${role}`;
+    const avLabel = role === 'bot' ? 'AI' : 'ME';
+    div.innerHTML = `
+      <div class="ev-msg-av">${avLabel}</div>
+      <div>
+        <div class="ev-bubble">${html}</div>
+        ${meta ? `<div class="ev-msg-meta">${meta}</div>` : ''}
+      </div>`;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+    return div;
+  }
+
+  // ── 打字中 ───────────────────────────────────────────────────
+  function showTyping() {
+    const div = document.createElement('div');
+    div.id = 'ev-typing';
+    div.className = 'ev-msg ev-bot';
+    div.innerHTML = `<div class="ev-msg-av">AI</div><div class="ev-bubble"><div class="ev-typing-dots"><span></span><span></span><span></span></div></div>`;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+  function hideTyping() {
+    const el = document.getElementById('ev-typing');
+    if (el) el.remove();
+  }
+
+  // ── 简单 Markdown 渲染 ───────────────────────────────────────
+  function md(text) {
+    return text
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/`([^`]+)`/g, '<code style="font-family:var(--ff-mono);font-size:11px;background:rgba(20,23,28,0.07);padding:1px 5px;border-radius:3px;">$1</code>')
+      .replace(/^#{1,3}\s(.+)$/gm, '<strong style="font-size:13px;color:var(--accent-warm)">$1</strong>')
+      .replace(/^[-•·]\s(.+)$/gm, '&nbsp;• $1')
+      .replace(/\n\n/g, '<br><br>')
+      .replace(/\n/g, '<br>');
+  }
+
+  // ── 核心：调用 DeepSeek API ──────────────────────────────────
+  async function send(overrideText) {
+    const text = (overrideText || textarea.value).trim();
+    if (!text || isLoading) return;
+
+    // 检查 API Key
+    if (!DS_API_KEY || DS_API_KEY.startsWith('sk-xxx')) {
+      appendMsg('bot', '<strong style="color:var(--bad)">⚠ 未配置 API Key</strong><br>在 HTML 源码中找到 <code style="font-family:var(--ff-mono);font-size:11px;background:rgba(20,23,28,0.07);padding:1px 5px;border-radius:3px;">DS_API_KEY</code> 变量，填入你的 DeepSeek API Key。', '配置提示');
+      return;
+    }
+
+    // 用户气泡
+    const userHtml = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    appendMsg('user', userHtml, nowStr());
+    textarea.value = '';
+    textarea.style.height = 'auto';
+
+    // 更新 history
+    history.push({ role: 'user', content: text });
+    if (history.length > MAX_TURNS * 2) history = history.slice(-MAX_TURNS * 2);
+
+    isLoading = true;
+    sendBtn.disabled = true;
+    showTyping();
+
+    try {
+      const resp = await fetch('https://aigate-dev.catl.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${DS_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: model,
+          max_tokens: MAX_TOKENS,
+          temperature: 0.25,
+          messages: [
+            { role: 'system', content: SYS },
+            ...history
+          ]
+        })
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.error?.message || `HTTP ${resp.status}`);
+      }
+
+      const data = await resp.json();
+      const reply = data.choices?.[0]?.message?.content || '未获取到回复，请重试。';
+      const modelUsed = data.model || model;
+      const tokensUsed = data.usage?.total_tokens || '—';
+
+      hideTyping();
+      appendMsg('bot', md(reply), `${modelUsed} · ${tokensUsed} tokens · ${nowStr()}`);
+      history.push({ role: 'assistant', content: reply });
+
+      // 未读提示（面板关闭时）
+      if (!isOpen) {
+        unreadDot.classList.add('ev-show');
+      }
+
+    } catch (err) {
+      hideTyping();
+      let msg = err.message || '未知错误';
+      if (msg.includes('401')) msg = 'API Key 无效，请检查配置';
+      else if (msg.includes('402')) msg = 'API 余额不足，请充值';
+      else if (msg.includes('429')) msg = '请求过于频繁，请稍后重试';
+      else if (msg.includes('fetch')) msg = '网络连接失败，请检查网络';
+      appendMsg('bot', `<span style="color:var(--bad)">❌ 请求失败：${msg}</span>`, nowStr());
+      history.pop();
+    } finally {
+      isLoading = false;
+      sendBtn.disabled = false;
+    }
+  }
+
+  // ── 3s 后显示未读引导 ────────────────────────────────────────
+  setTimeout(() => {
+    if (!isOpen) unreadDot.classList.add('ev-show');
+  }, 3500);
+
+})();
+</script>
+
 </body>
 </html>
